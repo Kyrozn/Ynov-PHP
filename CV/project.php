@@ -2,6 +2,20 @@
 session_start();
 require 'db.php'; // Include the database connection
 
+// index.php
+$requestUri = $_SERVER['REQUEST_URI'];
+
+// Remove any query string from the URL
+$requestUri = parse_url($requestUri, PHP_URL_PATH);
+
+// Match routes
+if (isset($_GET['id'])) {
+    $voucherId = $_GET['id'];
+    echo "project details for ID " . htmlspecialchars($voucherId);
+} else {
+    echo "No voucher ID provided.";
+}
+
 $personalInfo;
 $cvinfo;
 // Check if the user is logged in as admin

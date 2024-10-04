@@ -1,9 +1,9 @@
 <?php
 session_start();
 require 'db.php';
+$counter = 0;
 if (isset($_COOKIE['UserTokenSession'])) {
     $userId = $_COOKIE['UserTokenSession'];
-
     // Assure-toi que l'ID est un entier pour évi!ter des injections SQL (par mesure de sécurité)
     if (isset($userId)) {
         $stmt = $pdo->prepare('SELECT * FROM Users WHERE Id = ?');
@@ -19,6 +19,10 @@ $Projects;
 $stmt = $pdo->prepare('SELECT * FROM Projects');
 $stmt->execute();
 $Projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$Users;
+$stmt = $pdo->prepare('SELECT * FROM Users');
+$stmt->execute();
+$Users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -132,7 +136,7 @@ $Projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 
 <body>
-    <div class="topnav">
+    <header class="topnav">
         <div style="display: flex; align-items: center;">
             <input id="inputBar" placeholder="Search User, Specific Project if he exists" type="text">
             <button class="Search" aria-label="Search">
@@ -169,47 +173,83 @@ $Projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <? endif; ?>
             </ul>
         </nav>
-    </div>
+    </header>
 
     <div style="display: flex;justify-content: center;flex-direction: column;align-items: center;">
         <h2>Welcome To This WebSite</h2>
         <p>You can found Here The different Project Created by our User, See their CVs, And Contact Them</p>
     </div>
 
-    <div class="main-gallery-project">
-        <? foreach ($Projects as &$project) { ?>
-            <div class="main-gallery-project__block" id="<? echo $project['Project_Id']; ?>">
-                <!-- Display project details here -->
-                <h3><?php echo $project['Title']; ?></h3>
-                <? if (!is_null($project['LinkImage'])) : ?>
-                    <img src=<?php echo $project['LinkImage'] ?> alt="Search icon" class="animated-image">
-                <? else : ?>
-                    <img src="/ressources/logoYnov.jpg" alt="Search icon" class="animated-image">
-                <? endif; ?>
-                <p style="text-align: center;"><?php echo $project['Description']; ?></p>
-            </div>
-        <? } ?>
-    <div>
+    <div class="main-gallery">
+        <div class="main-column">
+            <? foreach ($Users as &$user) { ?>
+                <? if ($counter >= 10) { ?>
+                    break;
+                <? } ?>
+                <div class="main-gallery-project__block" id="<? echo $user['Id']; ?>">
+                    <!-- Display project details here -->
+                    <? if (!is_null($user['PP_User'])) : ?>
+                        <img src=<?php echo $user['PP_User'] ?> alt="PP User" class="PPUser">
+                    <? else : ?>
+                        <img src="/ressources/user_Img.png" alt="PP User" class="PPUser">
+                    <? endif; ?>
+                    <h3><?php echo $user['First_name'], " ", $user['Last_name']; ?></h3>
+                    <p style="text-align: center;"><?php echo $user['UserText']; ?></p>
+                </div>
+                <? $counter++ ?>
+            <? } ?>
+        </div>
+        <div class="main-column">
+            <? foreach ($Projects as &$project) { ?>
+                <? if ($counter >= 10) { ?>
+                    break;
+                <? } ?>
+                <div class="main-gallery-project__block" id="<? echo $project['Project_Id']; ?>">
+                    <!-- Display project details here -->
+                    <h6></h6>
+                    <h3><?php echo $project['Title']; ?></h3>
+                    <h4>by <?php $stmt = $pdo->prepare('SELECT First_name, Last_name FROM Users WHERE Id = ?');
+                            $stmt->execute([$project['User_ID']]);
+                            $user = $stmt->fetch();
+                            echo htmlspecialchars($user['First_name'] . " " . $user['Last_name']) ?></h4>
+                    <? if (!is_null($project['LinkImage'])) : ?>
+                        <img src=<?php echo $project['LinkImage'] ?> alt="Search icon" class="animated-image">
+                    <? else : ?>
+                        <img src="/ressources/logoYnov.jpg" alt="Search icon" class="animated-image">
+                    <? endif; ?>
+                    <p style="text-align: center;"><?php echo $project['Description']; ?></p>
+                </div>
+            <? $counter++;
+            } ?>
+        </div>
+    </div>
 
-            <script>
-                document.addEventListener("DOMContentLoaded", function() {
-                    const button = document.querySelector(".hamburger");
-                    const nav = document.querySelector("nav");
-                    const inputbar = document.querySelector("#inputBar");
-                    const search = document.querySelector(".Search");
+    <footer>
+        <p>© 2024 YNOV</p>
+        <a href="#" class="logo">
+            <img alt="ynov campus" src="/ressources/YnovCampusLogo.png">
+        </a>
+    </footer>
 
-                    button.addEventListener("click", function() {
-                        nav.classList.toggle("show");
-                        const isExpanded = nav.classList.contains("show");
-                        button.setAttribute("aria-expanded", isExpanded);
-                    });
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const button = document.querySelector(".hamburger");
+            const nav = document.querySelector("nav");
+            const inputbar = document.querySelector("#inputBar");
+            const search = document.querySelector(".Search");
 
-                    search.addEventListener("click", function() {
-                        search.classList.toggle("clicked");
-                        inputbar.classList.toggle("reveal");
-                    });
-                });
-            </script>
+            button.addEventListener("click", function() {
+                nav.classList.toggle("show");
+                const isExpanded = nav.classList.contains("show");
+                button.setAttribute("aria-expanded", isExpanded);
+            });
+
+            search.addEventListener("click", function() {
+                search.classList.toggle("clicked");
+                inputbar.classList.toggle("reveal");
+            });
+        });
+    </script>
 </body>
 
 </html>

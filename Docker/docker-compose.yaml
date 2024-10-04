@@ -1,0 +1,28 @@
+services:
+  webserver:
+    image: nginx:latest
+    ports:
+      - "5050:5050"
+    volumes:
+      - ./services/nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
+      - ../CV:/app
+  app:
+    build: services/php
+    volumes:
+      - ../CV:/app
+  db:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "ynovphp_db"
+    volumes:
+      - mysqldata:/var/lib/mysql
+    ports:
+      - 4000:4000
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8080:8080"
+
+volumes:
+  mysqldata: {}

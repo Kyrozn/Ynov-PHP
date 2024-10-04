@@ -1,8 +1,33 @@
+<?php
+session_start();
+require 'db.php';
+if (isset($_COOKIE['UserTokenSession'])) {
+    $userId = $_COOKIE['UserTokenSession'];
+
+    // Assure-toi que l'ID est un entier pour évi!ter des injections SQL (par mesure de sécurité)
+    if (isset($userId)) {
+        $stmt = $pdo->prepare('SELECT * FROM Users WHERE Id = ?');
+        $stmt->execute([$userId]);
+        $personalInfo = $stmt->fetch();
+
+        $stmt = $pdo->prepare('SELECT * FROM CV WHERE User_ID = ?');
+        $stmt->execute([$userId]);
+        $cvinfo = $stmt->fetch();
+    }
+}
+$Projects;
+$stmt = $pdo->prepare('SELECT * FROM Projects');
+$stmt->execute();
+$Projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/ressources/index.css">
     <style>
         body {
             margin: 0;
@@ -123,11 +148,25 @@
         <!-- Menu déroulant -->
         <nav id="menu">
             <ul>
-                <li><a href="login.php" style="text-decoration: none; color: white;">Login</a></li>
-                <li>Lien n°2</li>
-                <li>Lien n°3</li>
-                <li>Lien n°4</li>
-                <li>Lien n°5</li>
+                <? if (!isset($_COOKIE['UserTokenSession'])) : ?>
+                    <a href="login.php" style="text-decoration: none; color: white;">
+                        <li>Login</li>
+                    </a>
+                    <a href="register.php" style="text-decoration: none; color: white;">
+                        <li>Register</li>
+                    </a>
+                    <li>Lien n°3</li>
+                <? else : ?>
+                    <a href="profil.php" style="text-decoration: none; color: white;">
+                        <li>Your Profil</li>
+                    </a>
+                    <a href="project.php" style="text-decoration: none; color: white;">
+                        <li>Your Projects</li>
+                    </a>
+                    <a href="logout.php" style="text-decoration: none; color: white;">
+                        <li>Logout</li>
+                    </a>
+                <? endif; ?>
             </ul>
         </nav>
     </div>
@@ -137,25 +176,40 @@
         <p>You can found Here The different Project Created by our User, See their CVs, And Contact Them</p>
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const button = document.querySelector(".hamburger");
-            const nav = document.querySelector("nav");
-            const inputbar = document.querySelector("#inputBar");
-            const search = document.querySelector(".Search");
+    <div class="main-gallery-project">
+        <? foreach ($Projects as &$project) { ?>
+            <div class="main-gallery-project__block" id="<? echo $project['Project_Id']; ?>">
+                <!-- Display project details here -->
+                <h3><?php echo $project['Title']; ?></h3>
+                <? if (!is_null($project['LinkImage'])) : ?>
+                    <img src=<?php echo $project['LinkImage'] ?> alt="Search icon" class="animated-image">
+                <? else : ?>
+                    <img src="/ressources/logoYnov.jpg" alt="Search icon" class="animated-image">
+                <? endif; ?>
+                <p style="text-align: center;"><?php echo $project['Description']; ?></p>
+            </div>
+        <? } ?>
+    <div>
 
-            button.addEventListener("click", function() {
-                nav.classList.toggle("show");
-                const isExpanded = nav.classList.contains("show");
-                button.setAttribute("aria-expanded", isExpanded);
-            });
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    const button = document.querySelector(".hamburger");
+                    const nav = document.querySelector("nav");
+                    const inputbar = document.querySelector("#inputBar");
+                    const search = document.querySelector(".Search");
 
-            search.addEventListener("click", function() {
-                search.classList.toggle("clicked");
-                inputbar.classList.toggle("reveal");
-            });
-        });
-    </script>
+                    button.addEventListener("click", function() {
+                        nav.classList.toggle("show");
+                        const isExpanded = nav.classList.contains("show");
+                        button.setAttribute("aria-expanded", isExpanded);
+                    });
+
+                    search.addEventListener("click", function() {
+                        search.classList.toggle("clicked");
+                        inputbar.classList.toggle("reveal");
+                    });
+                });
+            </script>
 </body>
 
 </html>

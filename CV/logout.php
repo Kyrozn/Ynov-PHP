@@ -6,6 +6,6 @@ setcookie('UserTokenSession', '', time()-3600, '/', '', false, false);
 // Destroy the session to log out the user
 session_destroy();
 // Redirect to the CV page
-header("Location: login.php");
+header("Location: index.php");
 exit;
 ?>

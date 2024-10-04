@@ -46,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file'])) {
     if ($file['error'] == 0) {
         $fileName = $file['name'];
         $fileTmp = $file['tmp_name'];
-        $fileDestination = "../ImageUpload/" . $fileName; // Dossier où stocker les fichiers
+        $fileDestination = 'uploads/' . $fileName; // Dossier où stocker les fichiers
 
         // Déplacer le fichier vers son emplacement final
         if (move_uploaded_file($fileTmp, $fileDestination)) {

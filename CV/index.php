@@ -34,119 +34,17 @@ $Pivot = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/static/index.css">
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
-        }
-
-        .topnav {
-            display: flex;
-            justify-content: space-between;
-            background-color: #333;
-            padding: 10px;
-            max-height: 70px;
-            position: relative;
-        }
-
-        .hamburger {
-            padding: 15px;
-            cursor: pointer;
-            background-color: transparent;
-            border: none;
-            outline: none;
-        }
-
-        nav {
-            display: none;
-            /* Hide by default */
-            position: absolute;
-            top: 11.3vh;
-            right: 0;
-            width: 150px;
-            background-color: black;
-            transition: max-height 0.5s ease;
-        }
-
-        nav.show {
-            display: block;
-            /* Show when toggled */
-        }
-
-        nav ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        nav ul li {
-            padding: 10px;
-            color: white;
-            border-bottom: 1px solid white;
-            background-color: #333;
-            opacity: 0;
-            transform: translateY(-20px);
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
-
-        nav.show ul li {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        nav ul li:hover {
-            background-color: green;
-        }
-
-        .Search {
-            background-color: transparent;
-            border: none;
-            cursor: pointer;
-            outline: none;
-            height: auto;
-            width: auto;
-        }
-
-        .animated-image {
-            max-width: 40px;
-            height: auto;
-            display: block;
-        }
-
-        .Search.clicked .animated-image {
-            transform: rotate(-90deg);
-            transition: transform 0.5s ease, opacity 0.5s ease;
-        }
-
-        /* Search bar styling */
-        #inputBar {
-            width: 0;
-            opacity: 0;
-            border: none;
-            padding: 10px;
-            transition: width 0.5s ease, opacity 0.5s ease;
-            background-color: white;
-            border-radius: 5px;
-        }
-
-        /* When search is active */
-        #inputBar.reveal {
-            width: 200px;
-            opacity: 1;
-        }
-        .PPUser {
-            max-height: 60px;
-            max-width: 60px;
-            border-radius: 100%;
-        }
-    </style>
+    <link rel="stylesheet" href="./static/index.css">
 </head>
 
 <body>
     <header class="topnav">
         <div style="display: flex; align-items: center;">
-            <input id="inputBar" placeholder="Search User, Specific Project if he exists" type="text">
+            <div>
+                <input id="inputBar" placeholder="Search User, Specific Project if he exists" type="text" oninput="getLiveValue()">
+                <div class="resultBox" style="position: absolute;">
+                </div>
+            </div>
             <button class="Search" aria-label="Search">
                 <img src="./static/loupe.png" alt="Search icon" class="animated-image">
             </button>
@@ -182,6 +80,11 @@ $Pivot = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <a href="project.php" style="text-decoration: none; color: white;">
                         <li>Your Projects</li>
                     </a>
+                    <? if ($personalInfo['UserRole'] === "Admin") : ?>
+                        <a href="adminPanel.php" style="text-decoration: none; color: white;">
+                            <li>Admin Panel</li>
+                        </a>
+                    <? endif; ?>
                     <a href="logout.php" style="text-decoration: none; color: white;">
                         <li>Logout</li>
                     </a>
@@ -195,16 +98,16 @@ $Pivot = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="main-gallery">
         <div class="main-column">
             <? foreach ($Users as &$user) { ?>
-                <? if ($counter >= 10) { ?>
+                <? if ($counter >= 10) {
                     break;
-                <? } ?>
+                } ?>
                 <a href="profil.php?id=<? echo $user['Id']; ?>" style="text-decoration: none; color: black">
                     <div class="main-gallery-project__block" id="<? echo $user['Id']; ?>">
                         <!-- Display project details here -->
                         <? if (!is_null($user['PP_User'])) : ?>
                             <img src="./ImageUpload/UserPP/<?php echo $user['PP_User'] ?>" alt="PP User" class="PPUser">
                         <? else : ?>
-                            <img src="/static/user_Img.png" alt="PP User" class="PPUser">
+                            <img src="/ImageUpload/UserPP/user_Img.png" alt="PP User" class="PPUser">
                         <? endif; ?>
                         <h3><?php echo $user['First_name'], " ", $user['Last_name']; ?></h3>
                         <p style="text-align: center;"><?php echo $user['UserText']; ?></p>
@@ -215,34 +118,36 @@ $Pivot = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
         <div class="main-column">
             <? foreach ($Projects as &$project) { ?>
-                <? if ($counter >= 10) { ?>
+                <? if ($counter >= 10) {
                     break;
-                <? } ?>
-                <a href="project.php?id=<? echo $project['Project_Id']; ?>" style="text-decoration: none; color: black">
-                    <div class="main-gallery-project__block" id="<? echo $project['Project_Id']; ?>">
-                        <!-- Display project details here -->
-                        <div>
-                            <div style="display: flex; flex-direction: row; align-items: center;">
-                                <? if (!is_null($project['LinkImage'])) : ?>
-                                    <img src="../ImageUpload/OtherImg/<?php echo $project['LinkImage'] ?>" alt="Search icon" class="animated-image">
-                                <? else : ?>
-                                    <img src="/static/logoYnov.jpg" alt="Search icon" class="animated-image">
-                                <? endif; ?>
-                                <h3 style="margin-left: 5px;"><?php echo $project['Title']; ?></h3>
-                            </div>
+                } ?>
+                <? if ($project['Validate'] === 1) { ?>
+                    <a href="project.php?id=<? echo $project['Project_Id']; ?>" style="text-decoration: none; color: black">
+                        <div class="main-gallery-project__block" id="<? echo $project['Project_Id']; ?>">
+                            <!-- Display project details here -->
+                            <div>
+                                <div style="display: flex; flex-direction: row; align-items: center;">
+                                    <? if (!is_null($project['LinkImage'])) : ?>
+                                        <img src="../ImageUpload/OtherImg/<?php echo $project['LinkImage'] ?>" alt="Search icon" class="animated-image">
+                                    <? else : ?>
+                                        <img src="/ImageUpload/OtherImg/logoYnov.jpg" alt="Search icon" class="animated-image">
+                                    <? endif; ?>
+                                    <h3 style="margin-left: 5px;"><?php echo $project['Title']; ?></h3>
+                                </div>
 
-                            <h6 style="margin-top: 5px;">Subjects: <?php echo $project['Subjects']; ?> by <?php $stmt = $pdo->prepare('SELECT * FROM ProjectsUsers WHERE Projects_Id = ?');
-                                                                                                            $stmt->execute([$project['Project_Id']]);
-                                                                                                            $pivot = $stmt->fetch();
-                                                                                                            $stmt = $pdo->prepare('SELECT First_name, Last_name FROM Users WHERE Id = ?');
-                                                                                                            $stmt->execute([$pivot['Users_Id']]);
-                                                                                                            $user = $stmt->fetch();
-                                                                                                            echo htmlspecialchars($user['First_name'] . " " . $user['Last_name']) ?></h6>
-                            </h6>
+                                <h6 style="margin-top: 5px;">Subjects: <?php echo $project['Subjects']; ?> by <?php $stmt = $pdo->prepare('SELECT * FROM ProjectsUsers WHERE Projects_Id = ?');
+                                                                                                                $stmt->execute([$project['Project_Id']]);
+                                                                                                                $pivot = $stmt->fetch();
+                                                                                                                $stmt = $pdo->prepare('SELECT First_name, Last_name FROM Users WHERE Id = ?');
+                                                                                                                $stmt->execute([$pivot['Users_Id']]);
+                                                                                                                $user = $stmt->fetch();
+                                                                                                                echo htmlspecialchars($user['First_name'] . " " . $user['Last_name']) ?></h6>
+                                </h6>
+                            </div>
+                            <p style="text-align: center;"> Description : <?php echo $project['Description']; ?></p>
                         </div>
-                        <p style="text-align: center;"> Description : <?php echo $project['Description']; ?></p>
-                    </div>
-                </a>
+                    </a>
+                <? } ?>
             <? $counter++;
             } ?>
         </div>
@@ -256,11 +161,12 @@ $Pivot = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </footer>
 
     <script>
+        const search = document.querySelector(".Search");
         document.addEventListener("DOMContentLoaded", function() {
             const button = document.querySelector(".hamburger");
             const nav = document.querySelector("nav");
             const inputbar = document.querySelector("#inputBar");
-            const search = document.querySelector(".Search");
+
 
             button.addEventListener("click", function() {
                 nav.classList.toggle("show");
@@ -272,7 +178,44 @@ $Pivot = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 search.classList.toggle("clicked");
                 inputbar.classList.toggle("reveal");
             });
+
+
         });
+
+        function getLiveValue() {
+            const inputValue = document.getElementById('inputBar').value.toLowerCase();
+            const resultBox = document.querySelector('.resultBox');
+            resultBox.innerHTML = '';
+
+            if (inputValue) {
+                <?php foreach ($Users as $user) : ?>
+                    if ('<?php echo htmlspecialchars($user['First_name'] . " " . $user['Last_name']); ?>'.toLowerCase().includes(inputValue)) {
+                        const userDiv = document.createElement('div');
+                        userDiv.classList.add('search-result');
+                        userDiv.innerHTML = `
+                            <a href="profil.php?id=<?php echo $user['Id']; ?>" style="text-decoration: none; color: white; display: flex; align-items: center;">
+                                <img src="./ImageUpload/UserPP/<?php echo $user['PP_User'] ?? 'user_Img.png'; ?>" class="PPUser" style="width:30px; height:30px" alt="PP User">
+                                <h4>${'<?php echo htmlspecialchars($user['First_name'] . " " . $user['Last_name']); ?>'}</h4>
+                            </a>
+                        `;
+                        resultBox.appendChild(userDiv);
+                    }
+                <?php endforeach; ?>
+                <?php foreach ($Projects as $project) : ?>
+                    if ('<?php echo htmlspecialchars($project['Title'] . " " . $project['Subjects']); ?>'.toLowerCase().includes(inputValue)) {
+                        const userDiv = document.createElement('div');
+                        userDiv.classList.add('search-result');
+                        userDiv.innerHTML = `
+                            <a href="project.php?id=<?php echo $project['Project_Id']; ?>" style="text-decoration: none; color: white; display: flex; align-items: center;">
+                                <img src="./ImageUpload/OtherImg/<?php echo $project['LinkImage'] ?? 'user_Img.png'; ?>" class="PPUser" style="width:30px; height:30px" alt="PP User">
+                                <h4>${'<?php echo htmlspecialchars($project['Title']); ?>'}</h4>
+                            </a>
+                        `;
+                        resultBox.appendChild(userDiv);
+                    }
+                <?php endforeach; ?>
+            }
+        }
     </script>
 </body>
 

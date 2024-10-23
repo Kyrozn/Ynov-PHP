@@ -94,7 +94,7 @@ if (isset($_GET['id'])) {
 
     <body>
         <header style="justify-content: space-around;" class="topnav">
-            <h1 style="text-align:center; color:white;"><? echo htmlspecialchars($personalInfo['First_name'] ." ". $personalInfo['Last_name']) ?> Differents Projet</h1>
+            <h1 style="text-align:center; color:white;"><? echo htmlspecialchars($personalInfo['First_name'] . " " . $personalInfo['Last_name']) ?> Differents Projet</h1>
             <a style="text-decoration:none; color:white" href="http://localhost:5050">HOME</a>
         </header>
         <? foreach ($projectInfo as $project) : ?>
@@ -120,6 +120,11 @@ if (isset($_GET['id'])) {
                         <? } ?>
                     </div>
                 </div>
+                <?
+                if ($project['Validate'] === 0) {
+                    echo htmlspecialchars("Waiting for admin validation");
+                }
+                ?>
             </div>
         <? endforeach ?>
     </body>

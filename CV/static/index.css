@@ -1,3 +1,97 @@
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.topnav {
+    display: flex;
+    justify-content: space-between;
+    background-color: #333;
+    padding: 10px;
+    max-height: 70px;
+    position: relative;
+}
+.hamburger {
+    padding: 15px;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    outline: none;
+}
+nav {
+    display: none;
+    position: absolute;
+    top: 11.3vh;
+    right: 0;
+    width: 150px;
+    background-color: black;
+    transition: max-height 0.5s ease;
+}
+nav.show {
+    display: block;
+}
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+nav ul li {
+    padding: 10px;
+    color: white;
+    border-bottom: 1px solid white;
+    background-color: #333;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+nav.show ul li {
+    opacity: 1;
+    transform: translateY(0);
+}
+nav ul li:hover {
+    background-color: green;
+}
+.Search {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+.animated-image {
+    max-width: 40px;
+    height: auto;
+    display: block;
+}
+.Search.clicked .animated-image {
+    transform: rotate(-90deg);
+    transition: transform 0.5s ease, opacity 0.5s ease;
+}
+#inputBar {
+    width: 0;
+    opacity: 0;
+    border: none;
+    padding: 10px;
+    transition: width 0.5s ease, opacity 0.5s ease;
+    background-color: white;
+    border-radius: 5px;
+}
+#inputBar.reveal {
+    width: 200px;
+    opacity: 1;
+}
+.PPUser {
+    max-height: 60px;
+    max-width: 60px;
+    border-radius: 100%;
+}
+.search-result {
+    width: 220px;
+    height: 60px;
+    background-color: #333;
+    border-radius: 5%;
+    border: 2px solid black; /* Bordure */
+}
+
 .main-gallery-project__block {
     display: flex;
     flex-direction: column;

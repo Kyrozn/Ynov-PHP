@@ -47,9 +47,12 @@ if (!isset($_GET['id'])) {
         $Skills = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 } else {
+    
 
     $voucherId = $_GET['id'];
-
+    if ($voucherId === $_COOKIE['UserTokenSession']) {
+        header("Location: profil.php");
+    }
     $stmt = $pdo->prepare('SELECT * FROM Users WHERE Id = ?');
     $stmt->execute([$voucherId]);
     $personalInfo = $stmt->fetch();
@@ -89,25 +92,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['F_name'])) {
     exit;
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file'])) {
-    $file = $_FILES['file'];
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['PPupload'])) {
+    $file = $_FILES['PPupload'];
 
-    if ($file['error'] == 0) {
-        $fileName = $file['name'];
-        $fileTmp = $file['tmp_name'];
-        $fileDestination = "../ImageUpload/" . $fileName; // Dossier où stocker les fichiers
-
-        // Déplacer le fichier vers son emplacement final
-        if (move_uploaded_file($fileTmp, $fileDestination)) {
-            echo "File uploaded successfully";
-        } else {
-            echo "Error during file upload";
-        }
-    } else {
-        echo "File upload error: " . $file['error'];
+    if ($file['error'] !== 0) {
+        echo "Erreur lors de l'upload du fichier.";
+        exit;
     }
-}
 
+    $allowedExtensions = ['jpg', 'jpeg', 'png'];
+    $fileExt = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+    if (!in_array($fileExt, $allowedExtensions)) {
+        echo "Seules les images de type JPG, JPEG ou PNG sont acceptées.";
+        exit;
+    }
+
+    $maxFileSize = 20 * 1024 * 1024; // 5MB
+    if ($file['size'] > $maxFileSize) {
+        echo "La taille du fichier ne doit pas dépasser 20MB.";
+        exit;
+    }
+
+    $safeFileName = $userId . "." . $fileExt;
+    $uploadDir = "./ImageUpload/UserPP/";
+    $fileDestination = $uploadDir . $safeFileName;
+
+    if (move_uploaded_file($file['tmp_name'], $fileDestination)) {
+        $stmt = $pdo->prepare('UPDATE Users SET PP_User = ? WHERE Id = ?');
+        $stmt->execute([$safeFileName, $userId]);
+        header("Location: profil.php");
+    }
+}   
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
     $Title = $_POST['TitleUser'];
     $Description = $_POST['DescriptionUser'];
@@ -208,9 +224,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
         <!-- Header Section -->
         <header>
             <? if (!is_null($personalInfo['BackgroundUser'])) : ?>
-                <img src=<?php echo $personalInfo['BackgroundUser'] ?> alt="BackgroundUser" class="BackgroundImage">
+                <img src="/ImageUpload/Background/<?php echo $personalInfo['BackgroundUser'] ?>" alt="BackgroundUser" class="BackgroundImage">
             <? else : ?>
-                <img src="/static/backgroundDefault.jpg" alt="BackgroundImage" class="BackgroundImage">
+                <img src="/ImageUpload/Background/backgroundDefault.jpg" alt="BackgroundImage" class="BackgroundImage">
             <? endif; ?>
             <?php if (isset($personalInfo) && isset($_COOKIE['UserTokenSession']) && $personalInfo['Id'] === $_COOKIE['UserTokenSession']): ?>
                 <form action="index.php" method="POST" enctype="multipart/form-data" style="display:none">
@@ -220,16 +236,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
             <? endif; ?>
             <div style="display: flex; align-items: center; justify-content: space-between;">
                 <div class="infoUser" style="display: flex; align-items: center;">
-                    <? if (!is_null($personalInfo['PP_User'])) : ?>
-                        <img src="./ImageUpload/UserPP/<?php echo $personalInfo['PP_User'] ?>" alt="PP User" class="PPUser">
-                    <? else : ?>
-                        <img src="/static/user_Img.png" alt="PP User" class="PPUser">
-                    <? endif; ?>
+                    <form id="uploadForm" style="display: flex;" action="" method="POST" enctype="multipart/form-data">
+                        <label for="PPupload">
+                            <?php if (!is_null($personalInfo['PP_User'])) : ?>
+                                <img src="./ImageUpload/UserPP/<?php echo htmlspecialchars($personalInfo['PP_User']); ?>" alt="PP User" class="PPUser" id="PPUser" >
+                            <?php else : ?>
+                                <img src="/ImageUpload/UserPP/user_Img.png" alt="PP User" class="PPUser" id="PPUser">
+                            <?php endif; ?>
+                        </label>
+                        <input type="file" accept=".jpg, .jpeg, .png" name="PPupload" id="PPupload" style="opacity: 0; width: 0;" onchange="document.getElementById('uploadForm').submit();" />
+                    </form>
+
                     <h1 style="margin-left: 10px"><?php echo $personalInfo['First_name'] ?> <?php echo $personalInfo['Last_name'] ?></h1>
                 </div>
                 <div class="header-controls">
                     <?php if (isset($personalInfo) && isset($_COOKIE['UserTokenSession']) && $personalInfo['Id'] === $_COOKIE['UserTokenSession']): ?>
-                        <button id="editBtn"><img src="/static/parameters.png" alt="Settings"></button>
+                        <button id="editBtn" style="background-color: transparent;"><img src="/static/parameters.png" alt="Settings"></button>
                     <?php endif; ?>
                 </div>
             </div>
@@ -312,7 +334,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
                                 <br><br>
                             </div>
                         <? } ?>
-                        <button type="button" onclick="addExp()">Ajouter une Experience</button>
+                        <button type="button" onclick="addExp()" class="AddButton">+</button>
                     </div>
                     <!-- Compétences -->
                     <h2>Compétences</h2>
@@ -325,7 +347,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
                                 <input type="number" id="Description" name="skillYear[]" placeholder="YearsXP" value="<? echo $skill['YearsXP'] ?? "" ?>">
                             </div>
                         <? } ?>
-                        <button type="button" onclick="addSkill()">Ajouter une Compétence</button>
+                        <button type="button" onclick="addSkill()" class="AddButton">+</button>
                     </div>
                     <!-- Éducation -->
                     <h2>Éducation</h2>
@@ -338,10 +360,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
                                 <input type="date" id="Description" name="EducationEnd[]" placeholder="DateEnd" value="<? echo $edu['End_Date'] ?? "" ?>">
                             </div>
                         <? } ?>
-                        <button type="button" onclick="addEducation()">Ajouter une Compétence</button>
+                        <button type="button" onclick="addEducation()" class="AddButton">+</button>
                     </div>
                     <!-- Soumettre -->
-                    <button type="submit">Enregistrer le CV</button>
+                    <button type="submit" class="register">Enregistrer le CV</button>
                 </form>
             </div>
         <? else : ?>
@@ -422,7 +444,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
                 <input type="text" id="Description" name="experienceDesc[]" placeholder="Description" value="<? echo $exp['Description'] ?? "" ?>">
                 <input type="date" id="Description" name="experienceStart[]" placeholder="DateStart" value="<? echo $exp['Start_Date'] ?? "" ?>">
                 <input type="date" id="Description" name="experienceEnd[]" placeholder="DateEnd" value="<? echo $exp['End_Date'] ?? "" ?>">
-                <button type="button" onclick="remove(this)">Supprimer</button>
+                <button type="button" onclick="remove(this)"class="AddButton">-</button>
                 <br><br>
             `;
             document.getElementById('exp-container').appendChild(expDiv);
@@ -435,7 +457,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
                 <input type="text" id="Title" name="skillTitle[]" placeholder="Title" value="<? echo $skill['Title'] ?? "" ?>">
                 <input type="text" id="Description" name="skillDesc[]" placeholder="Description" value="<? echo $skill['Description'] ?? "" ?>">
                 <input type="number" id="Description" name="skillYear[]" placeholder="YearsXP" value="<? echo $skill['YearsXP'] ?? "" ?>">
-                <button type="button" onclick="remove(this)">Supprimer</button>
+                <button type="button" onclick="remove(this)" class="AddButton">-</button>
                 <br><br>
             `;
             document.getElementById('skill-container').appendChild(skillDiv);
@@ -448,7 +470,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
                 <input type="text" id="Title" name="EducationSchool[]" placeholder="School Name" value="<? echo $edu['School'] ?? "" ?>">
                 <input type="date" id="Description" name="EducationStart[]" placeholder="DateStart" value="<? echo $edu['Start_Date'] ?? "" ?>">
                 <input type="date" id="Description" name="EducationEnd[]" placeholder="DateEnd" value="<? echo $edu['End_Date'] ?? "" ?>">
-                <button type="button" onclick="remove(this)">Supprimer</button>
+                <button type="button" onclick="remove(this)" class="AddButton">-</button>
                 <br><br>
             `;
             document.getElementById('edu-container').appendChild(eduDiv);

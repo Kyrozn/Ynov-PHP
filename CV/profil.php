@@ -1,48 +1,97 @@
 <?php
 session_start();
-require 'db.php'; // Include the database connection
+require_once 'db.php'; // Include the database connection
+require_once 'function.php';
 
 $personalInfo;
-$cvinfo;
-// Check if the user is logged in as admin
-$isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'];
-if (isset($_COOKIE['UserTokenSession'])) {
-    $userId = $_COOKIE['UserTokenSession'];
+$Cvinfo;
 
-    // Assure-toi que l'ID est un entier pour éviter des injections SQL (par mesure de sécurité)
-    if (isset($userId)) {
+$requestUri = $_SERVER['REQUEST_URI'];
+
+// Remove any query string from the URL
+$requestUri = parse_url($requestUri, PHP_URL_PATH);
+$ExpExts = [];
+$EduExts = [];
+$Skills = [];
+// Match routes
+if (!isset($_GET['id'])) {
+
+    if (isset($_COOKIE['UserTokenSession'])) {
+        $userId = $_COOKIE['UserTokenSession'];
+
         $stmt = $pdo->prepare('SELECT * FROM Users WHERE Id = ?');
         $stmt->execute([$userId]);
         $personalInfo = $stmt->fetch();
 
         $stmt = $pdo->prepare('SELECT * FROM CV WHERE User_ID = ?');
         $stmt->execute([$userId]);
-        $cvinfo = $stmt->fetch();
+        $Cvinfo = $stmt->fetch();
     } else {
-        echo "Invalid UserTokenSession";
+        header("Location: index.php");
+    }
+
+    if (isset($Cvinfo['CV_ID'])) {
+
+        $stmt = $pdo->prepare('SELECT * FROM ExpExternal WHERE CV_ID = ?');
+        $stmt->execute([$Cvinfo['CV_ID']]);
+        $ExpExts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+        $stmt = $pdo->prepare('SELECT * FROM EducationExt WHERE CV_ID = ?');
+        $stmt->execute([$Cvinfo['CV_ID']]);
+        $EduExts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+        $stmt = $pdo->prepare('SELECT * FROM Skills WHERE CV_ID = ?');
+        $stmt->execute([$Cvinfo['CV_ID']]);
+        $Skills = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 } else {
-    header("Location: index.php");
+
+    $voucherId = $_GET['id'];
+
+    $stmt = $pdo->prepare('SELECT * FROM Users WHERE Id = ?');
+    $stmt->execute([$voucherId]);
+    $personalInfo = $stmt->fetch();
+
+    $stmt = $pdo->prepare('SELECT * FROM CV WHERE User_ID = ?');
+    $stmt->execute([$personalInfo['Id']]);
+    $Cvinfo = $stmt->fetch();
+
+    if (isset($Cvinfo['CV_ID'])) {
+
+        $stmt = $pdo->prepare('SELECT * FROM ExpExternal WHERE CV_ID = ?');
+        $stmt->execute([$Cvinfo['CV_ID']]);
+        $ExpExts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $stmt = $pdo->prepare('SELECT * FROM EducationExt WHERE CV_ID = ?');
+        $stmt->execute([$Cvinfo['CV_ID']]);
+        $EduExts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $stmt = $pdo->prepare('SELECT * FROM Skills WHERE CV_ID = ?');
+        $stmt->execute([$Cvinfo['CV_ID']]);
+        $Skills = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 
-
 // Handle form submission and update the database
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['F_name'])) {
     $Fname = $_POST['F_name'];
     $Lname = $_POST['L_name'];
     $email = $_POST['Email'];
+    $phone = $_POST['phone'];
+    $UserTxt = $_POST['UserText'];
 
     // Update personal information in the database
-    $stmt = $pdo->prepare('UPDATE Users SET First_name = ?, Last_name = ?, Email = ? WHERE Id = ?');
-    $stmt->execute([$Fname, $Lname, $email, $personalInfo['Id']]);
-    header("Location: index.php");
+    $stmt = $pdo->prepare('UPDATE Users SET First_name = ?, Last_name = ?, Email = ?, UserText = ?, PhoneNB = ? WHERE Id = ?');
+    $stmt->execute([$Fname, $Lname, $email, $UserTxt, $phone, $personalInfo['Id']]);
+    header("Location: profil.php");
     exit;
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file'])) {
     $file = $_FILES['file'];
 
-    // Vérifier si le fichier a été téléchargé sans erreur
     if ($file['error'] == 0) {
         $fileName = $file['name'];
         $fileTmp = $file['tmp_name'];
@@ -59,6 +108,86 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file'])) {
     }
 }
 
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
+    $Title = $_POST['TitleUser'];
+    $Description = $_POST['DescriptionUser'];
+    $ExperienceTitle = isset($_POST['experienceTitle']) ? $_POST['experienceTitle'] : '';
+    $ExperienceDesc = isset($_POST['experienceDesc']) ? $_POST['experienceDesc'] : '';
+    $ExperienceStart = isset($_POST['experienceStart']) ? $_POST['experienceStart'] : '';
+    $ExperienceEnd = isset($_POST['experienceEnd']) ? $_POST['experienceEnd'] : '';
+
+    $SkillTitle = isset($_POST['skillTitle']) ? $_POST['skillTitle'] : '';
+    $SkillDesc = isset($_POST['skillDesc']) ? $_POST['skillDesc'] : '';
+    $SkillYear = isset($_POST['skillYear']) ? $_POST['skillYear'] : '';
+    $EduSchool = isset($_POST['EducationSchool']) ? $_POST['EducationSchool'] : '';
+    $EduStart = isset($_POST['EducationStart']) ? $_POST['EducationStart'] : '';
+    $EduEnd = isset($_POST['EducationEnd']) ? $_POST['EducationEnd'] : '';
+
+    if (is_null($Cvinfo['CV_ID'])) {
+        $CV_ID = guidv4();
+
+        $stmt = $pdo->prepare('INSERT INTO CV (CV_ID, User_ID, Title, Description) VALUES (?,?,?,?)');
+        $stmt->execute([$CV_ID, $_COOKIE['UserTokenSession'], $Title, $Description]);
+        if (is_array($ExperienceTitle)) {
+            for ($i = 0; $i < count($ExperienceTitle); $i++) {
+                $stmt = $pdo->prepare('INSERT INTO ExpExternal (ExpExt_ID, CV_ID, Title, Description, Start_Date, End_Date) VALUES (?,?,?,?,?,?)');
+                $stmt->execute([guidv4(), $CV_ID, $ExperienceTitle[$i], $ExperienceDesc[$i], $ExperienceStart[$i], $ExperienceEnd[$i]]);
+            }
+        }
+        if (is_array($SkillTitle)) {
+            for ($i = 0; $i < count($SkillTitle); $i++) {
+                $stmt = $pdo->prepare('INSERT INTO Skills (Skill_ID, CV_ID, Title, Description, YearsXP) VALUES (?,?,?,?,?)');
+                $stmt->execute([guidv4(), $CV_ID, $SkillTitle[$i], $SkillDesc[$i], $SkillYear[$i]]);
+            }
+        }
+        if (is_array($EduSchool)) {
+            for ($i = 0; $i < count($EduSchool); $i++) {
+                $stmt = $pdo->prepare('INSERT INTO EducationExt (EducationExt_ID, CV_ID, School, Start_Date, End_Date) VALUES (?,?,?,?,?)');
+                $stmt->execute([guidv4(), $CV_ID, $EduSchool[$i], $EduStart[$i], $EduEnd[$i]]);
+            }
+        }
+    } else {
+        $stmt = $pdo->prepare('UPDATE CV SET  Title = ?, Description = ? Where CV_ID = ?');
+        $stmt->execute([$Title, $Description, $Cvinfo['CV_ID']]);
+
+        if (is_array($ExperienceTitle)) {
+            for ($i = 0; $i < count($ExperienceTitle); $i++) {
+                if (array_key_exists($i, $ExpExts)) {
+                    $stmt = $pdo->prepare('UPDATE ExpExternal SET Title = ?, Description = ?, Start_Date = ?, End_Date = ? WHERE ExpExt_ID = ?');
+                    $stmt->execute([$ExperienceTitle[$i], $ExperienceDesc[$i], $ExperienceStart[$i], $ExperienceEnd[$i], $ExpExts[$i]['ExpExt_ID']]);
+                } else {
+                    $stmt = $pdo->prepare('INSERT INTO ExpExternal (ExpExt_ID, CV_ID, Title, Description, Start_Date, End_Date) VALUES (?,?,?,?,?,?)');
+                    $stmt->execute([guidv4(), $Cvinfo['CV_ID'], $ExperienceTitle[$i], $ExperienceDesc[$i], $ExperienceStart[$i], $ExperienceEnd[$i]]);
+                }
+            }
+        }
+        if (is_array($SkillTitle)) {
+            for ($i = 0; $i < count($SkillTitle); $i++) {
+                if (array_key_exists($i, $Skills)) {
+                    $stmt = $pdo->prepare('UPDATE Skills SET Title = ?, Description = ?, YearsXP = ? WHERE Skill_ID = ?');
+                    $stmt->execute([$SkillTitle[$i], $SkillDesc[$i], $SkillYear[$i], $Skills[$i]['Skill_ID']]);
+                } else {
+                    $stmt = $pdo->prepare('INSERT INTO Skills (Skill_ID, CV_ID, Title, Description, YearsXP) VALUES (?,?,?,?,?)');
+                    $stmt->execute([guidv4(), $Cvinfo['CV_ID'], $SkillTitle[$i], $SkillDesc[$i], $SkillYear[$i]]);
+                }
+            }
+        }
+        if (is_array($EduSchool)) {
+            for ($i = 0; $i < count($EduSchool); $i++) {
+                if (array_key_exists($i, $EduExts)) {
+                    $stmt = $pdo->prepare('UPDATE EducationExt SET School = ?, Start_Date = ?, End_Date = ? WHERE EducationExt_ID = ?');
+                    $stmt->execute([$EduSchool[$i], $EduStart[$i], $EduEnd[$i], $EduExts[$i]['EducationExt_ID']]);
+                } else {
+                    $stmt = $pdo->prepare('INSERT INTO EducationExt (EducationExt_ID, CV_ID, School, Start_Date, End_Date) VALUES (?,?,?,?,?)');
+                    $stmt->execute([guidv4(), $Cvinfo['CV_ID'], $EduSchool[$i], $EduStart[$i], $EduEnd[$i]]);
+                }
+            }
+        }
+    }
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -67,34 +196,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Curriculum Vitae</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Profil</title>
+    <link rel="stylesheet" href="/static/profil.css">
 </head>
 
 <body>
+    <div class="logout-container">
+        <a href="index.php" class="logout">Return</a>
+    </div>
     <div class="container">
         <!-- Header Section -->
-        <?php if (isset($personalInfo)): ?>
-            <header>
-                <form action="index.php" method="POST" enctype="multipart/form-data">
+        <header>
+            <? if (!is_null($personalInfo['BackgroundUser'])) : ?>
+                <img src=<?php echo $personalInfo['BackgroundUser'] ?> alt="BackgroundUser" class="BackgroundImage">
+            <? else : ?>
+                <img src="/static/backgroundDefault.jpg" alt="BackgroundImage" class="BackgroundImage">
+            <? endif; ?>
+            <?php if (isset($personalInfo) && isset($_COOKIE['UserTokenSession']) && $personalInfo['Id'] === $_COOKIE['UserTokenSession']): ?>
+                <form action="index.php" method="POST" enctype="multipart/form-data" style="display:none">
                     <input type="file" name="file">
                     <button type="submit">Enregistrer</button>
                 </form>
-                <h1><?php echo $personalInfo['First_name'] ?></h1>
-                <p><?php echo $personalInfo['Last_name'] ?></p>
-                <p>Email: <?php echo $personalInfo['Email']; ?> | Phone: <a href="tel:<? $personalInfo['PhoneNB']; ?>"><?php echo $personalInfo['PhoneNB']; ?></a></p>
-                <button id="editBtn">Edit Personal Info</button>
-                <a href="logout.php">Logout</a>
-            </header>
-        <?php else: ?>
-            <header>
-                <h1>You are not connected</h1>
-                <p>You can connect to your account <a href="login.php" style="color:blue; text-decoration: underline">here</a></p>
-                <p>You can create an account <a href="register.php" style="color:blue; text-decoration: underline">here</a></p>
-            </header>
-        <?php endif; ?>
+            <? endif; ?>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div class="infoUser" style="display: flex; align-items: center;">
+                    <? if (!is_null($personalInfo['PP_User'])) : ?>
+                        <img src="./ImageUpload/UserPP/<?php echo $personalInfo['PP_User'] ?>" alt="PP User" class="PPUser">
+                    <? else : ?>
+                        <img src="/static/user_Img.png" alt="PP User" class="PPUser">
+                    <? endif; ?>
+                    <h1 style="margin-left: 10px"><?php echo $personalInfo['First_name'] ?> <?php echo $personalInfo['Last_name'] ?></h1>
+                </div>
+                <div class="header-controls">
+                    <?php if (isset($personalInfo) && isset($_COOKIE['UserTokenSession']) && $personalInfo['Id'] === $_COOKIE['UserTokenSession']): ?>
+                        <button id="editBtn"><img src="/static/parameters.png" alt="Settings"></button>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </header>
 
-
+        <p>Email: <a href="mailto:<? echo $personalInfo['Email'] ?>"><? echo $personalInfo['Email'] ?></a> | Phone:
+            <? if (!is_null($personalInfo['PhoneNB'])): ?>
+                <a href="tel:<? $personalInfo['PhoneNB']; ?>"><?php echo $personalInfo['PhoneNB']; ?></a>
+            <? else : ?> Unknown
+            <? endif; ?>
+        </p>
         <!-- Profile Section -->
         <?php if (isset($personalInfo) && !empty($personalInfo)): ?>
             <section class="profile">
@@ -125,10 +271,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file'])) {
                     <input type="email" id="Email" name="Email" value="<?php echo $personalInfo['Email']; ?>" required>
 
                     <label for="phone">Phone:</label>
-                    <input type="text" id="phone" name="phone" value="<?php echo $personalInfo['PhoneNB']; ?>" required>
+                    <input type="text" id="phone" name="phone" value="<?php echo $personalInfo['PhoneNB']; ?>">
 
-                    <label for="UserText">Profile Description:</label> 
-                    <textarea id="UserText" name="UserText" required><?php echo $personalInfo['UserText']; ?></textarea>
+                    <label for="UserText">Profile Description:</label>
+                    <textarea id="UserText" name="UserText"><?php echo $personalInfo['UserText']; ?></textarea>
 
                     <input type="submit" value="Save Changes">
                 </form>
@@ -136,6 +282,111 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file'])) {
         </div>
     </div>
 
+    <div class="container CV">
+        <? if (isset($_COOKIE['UserTokenSession']) && isset($personalInfo) && $personalInfo['Id'] === $_COOKIE['UserTokenSession']) : ?>
+            <h1 style="text-align:center;">Création et édition du CV</h1>
+            <div class="container">
+
+                <form action="" method="post">
+                    <!-- Informations personnelles -->
+                    <h2 style="text-align: center;">Titre - description</h2>
+                    <label for="TitleUser">Titre</label>
+                    <input type="text" id="Title" name="TitleUser" value="<? echo $Cvinfo['Title'] ?? "" ?>" require>
+
+                    <label for="DescriptionUser">Description</label>
+                    <input type="text" id="Description" name="DescriptionUser" value="<? echo $Cvinfo['Description'] ?? "" ?>" required>
+
+                    <h3>Numero Téléphone</h3>
+                    <p><? echo $personalInfo['PhoneNB'] ?></p>
+
+                    <!-- Expérience professionnelle -->
+                    <h2>Expérience professionnelle</h2>
+                    <div id="exp-container">
+                        <? foreach ($ExpExts as $exp) { ?>
+                            <div>
+                                <label for="experience">Résumé de l'expérience</label>
+                                <input type="text" id="Title" name="experienceTitle[]" placeholder="Title" value="<? echo $exp['Title'] ?? "" ?>">
+                                <input type="text" id="Description" name="experienceDesc[]" placeholder="Description" value="<? echo $exp['Description'] ?? "" ?>">
+                                <input type="date" id="Description" name="experienceStart[]" placeholder="DateStart" value="<? echo $exp['Start_Date'] ?? "" ?>">
+                                <input type="date" id="Description" name="experienceEnd[]" placeholder="DateEnd" value="<? echo $exp['End_Date'] ?? "" ?>">
+                                <br><br>
+                            </div>
+                        <? } ?>
+                        <button type="button" onclick="addExp()">Ajouter une Experience</button>
+                    </div>
+                    <!-- Compétences -->
+                    <h2>Compétences</h2>
+                    <div id="skill-container">
+                        <? foreach ($Skills as $skill) { ?>
+                            <div>
+                                <label for="skills">Liste des compétences</label>
+                                <input type="text" id="Title" name="skillTitle[]" placeholder="Title" value="<? echo $skill['Title'] ?? "" ?>">
+                                <input type="text" id="Description" name="skillDesc[]" placeholder="Description" value="<? echo $skill['Description'] ?? "" ?>">
+                                <input type="number" id="Description" name="skillYear[]" placeholder="YearsXP" value="<? echo $skill['YearsXP'] ?? "" ?>">
+                            </div>
+                        <? } ?>
+                        <button type="button" onclick="addSkill()">Ajouter une Compétence</button>
+                    </div>
+                    <!-- Éducation -->
+                    <h2>Éducation</h2>
+                    <div id="edu-container">
+                        <? foreach ($EduExts as $edu) { ?>
+                            <div>
+                                <label for="education">Formation académique</label>
+                                <input type="text" id="Title" name="EducationSchool[]" placeholder="School Name" value="<? echo $edu['School'] ?? "" ?>">
+                                <input type="date" id="Description" name="EducationStart[]" placeholder="DateStart" value="<? echo $edu['Start_Date'] ?? "" ?>">
+                                <input type="date" id="Description" name="EducationEnd[]" placeholder="DateEnd" value="<? echo $edu['End_Date'] ?? "" ?>">
+                            </div>
+                        <? } ?>
+                        <button type="button" onclick="addEducation()">Ajouter une Compétence</button>
+                    </div>
+                    <!-- Soumettre -->
+                    <button type="submit">Enregistrer le CV</button>
+                </form>
+            </div>
+        <? else : ?>
+            <? if ($Cvinfo === " ") { ?>
+                <h1 style="text-align:center;">Cette personne n'a pas posté de CV</h1>
+            <? } else { ?>
+
+                <h1 style="text-align:center;">CV</h1>
+                <div class="container" style="width: auto">
+                    <h2>Informations personnelles</h2>
+                    <h3>Nom complet</h3>
+                    <p><? echo $personalInfo['First_name'] ?> <? echo $personalInfo['Last_name'] ?></p>
+
+                    <h3>Adresse Mail</h3>
+                    <a href="mailto:<? echo $personalInfo['Email'] ?>"><? echo $personalInfo['Email'] ?></a>
+
+                    <h3>Numero Téléphone</h3>
+                    <p><? echo $personalInfo['PhoneNB'] ?></p>
+
+                    <!-- Expérience professionnelle -->
+                    <h2>Expérience professionnelle</h2>
+                    <? if (!is_null($ExpExts)) { ?>
+                        <? foreach ($ExpExts as &$expExt) { ?>
+                            <h3><? echo $expExt['Title'] ?></h3>
+                            <p><? echo $expExt['Description'] ?></p>
+                        <? } ?>
+                    <? } ?>
+
+                    <!-- Compétences -->
+                    <h2>Compétences</h2>
+                    <? foreach ($Skills as &$skill) { ?>
+                        <h3><? echo $skill['Title'] ?> <? echo $skill['YearsXP'] ?> ans d'experience</h3>
+                        <p><? echo $skill['Description'] ?></p>
+                    <? } ?>
+
+                    <!-- Éducation -->
+                    <h2>Éducation</h2>
+                    <? foreach ($EduExts as &$EduExt) { ?>
+                        <h3><? echo $EduExt['School'] ?> </h3>
+                        <p><? echo $EduExt['Start_Date'] ?> - <? echo $EduExt['End_Date'] ?></p>
+                    <? } ?>
+                </div>
+            <? } ?>
+        <? endif; ?>
+    </div>
     <script>
         // Get modal and elements
         var modal = document.getElementById("myModal");
@@ -145,7 +396,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file'])) {
         // Open the modal when the edit button is clicked
         if (btn) {
             btn.onclick = function() {
-                modal.style.display = "block";
+                modal.style.display = "flex";
             }
         }
 
@@ -161,6 +412,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file'])) {
             if (event.target == modal) {
                 modal.style.display = "none";
             }
+        }
+        // Fonction pour ajouter une nouvelle entrée de formation
+        function addExp() {
+            const expDiv = document.createElement('div');
+            expDiv.innerHTML = `
+                <label for="experience">Résumé de l'expérience</label>
+                <input type="text" id="Title" name="experienceTitle[]" placeholder="Title" value="<? echo $exp['Title'] ?? "" ?>">
+                <input type="text" id="Description" name="experienceDesc[]" placeholder="Description" value="<? echo $exp['Description'] ?? "" ?>">
+                <input type="date" id="Description" name="experienceStart[]" placeholder="DateStart" value="<? echo $exp['Start_Date'] ?? "" ?>">
+                <input type="date" id="Description" name="experienceEnd[]" placeholder="DateEnd" value="<? echo $exp['End_Date'] ?? "" ?>">
+                <button type="button" onclick="remove(this)">Supprimer</button>
+                <br><br>
+            `;
+            document.getElementById('exp-container').appendChild(expDiv);
+        }
+
+        function addSkill() {
+            const skillDiv = document.createElement('div');
+            skillDiv.innerHTML = `
+                <label for="skills">Liste des compétences</label>
+                <input type="text" id="Title" name="skillTitle[]" placeholder="Title" value="<? echo $skill['Title'] ?? "" ?>">
+                <input type="text" id="Description" name="skillDesc[]" placeholder="Description" value="<? echo $skill['Description'] ?? "" ?>">
+                <input type="number" id="Description" name="skillYear[]" placeholder="YearsXP" value="<? echo $skill['YearsXP'] ?? "" ?>">
+                <button type="button" onclick="remove(this)">Supprimer</button>
+                <br><br>
+            `;
+            document.getElementById('skill-container').appendChild(skillDiv);
+        }
+
+        function addEducation() {
+            const eduDiv = document.createElement('div');
+            eduDiv.innerHTML = `
+                <label for="education">Formation académique</label>
+                <input type="text" id="Title" name="EducationSchool[]" placeholder="School Name" value="<? echo $edu['School'] ?? "" ?>">
+                <input type="date" id="Description" name="EducationStart[]" placeholder="DateStart" value="<? echo $edu['Start_Date'] ?? "" ?>">
+                <input type="date" id="Description" name="EducationEnd[]" placeholder="DateEnd" value="<? echo $edu['End_Date'] ?? "" ?>">
+                <button type="button" onclick="remove(this)">Supprimer</button>
+                <br><br>
+            `;
+            document.getElementById('edu-container').appendChild(eduDiv);
+        }
+
+        // Fonction pour supprimer une entrée de formation
+        function remove(button) {
+            button.parentElement.remove();
         }
     </script>
 </body>

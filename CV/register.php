@@ -35,33 +35,52 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Registration</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/static/login.css">
 </head>
+
 <body>
     <div class="container">
-        <h2>User Registration</h2>
-        <?php if (!empty($error)): ?>
-            <p style="color:red;"><?php echo $error; ?></p>
-        <?php endif; ?>
-        <form method="POST" action="">
-            <label for="Fname">First Name:</label>
-            <input type="text" id="Fname" name="Fname" required>
-
-            <label for="Lname">Last Name:</label>
-            <input type="text" id="Lname" name="Lname" required>
-
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-
-            <input type="submit" value="Register">
-        </form>
+        <div class="screen">
+            <div class="screen__content">
+                <?php if (!empty($error)): ?>
+                    <p style="color:red;"><?php echo $error; ?></p>
+                <?php endif; ?>
+                <form method="POST" action="" class="login">
+                    <div class="login__field">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="Fname" name="Fname" placeholder="Prenom" required>
+                    </div>
+                    <div class="login__field">
+                        <i class="login__icon fas fa-lock"></i>
+                        <input type="text" id="Lname" name="Lname" placeholder="Nom" required>
+                    </div>
+                    <div class="login__field">
+                        <i class="login__icon fas fa-lock"></i>
+                        <input type="email" id="email" name="email" placeholder="Email" required>
+                    </div>
+                    <div class="login__field">
+                        <i class="login__icon fas fa-lock"></i>
+                        <input type="password" id="password" name="password" placeholder="Password" required>
+                    </div>
+                    <button class="button login__submit">
+                        <span class="button__text">Register Now</span>
+                        <i class="button__icon fas fa-chevron-right"></i>
+                    </button>
+                </form>
+            </div>
+            <div class="screen__background">
+                <span class="screen__background__shape screen__background__shape4"></span>
+                <span class="screen__background__shape screen__background__shape3"></span>
+                <span class="screen__background__shape screen__background__shape2"></span>
+                <span class="screen__background__shape screen__background__shape1"></span>
+            </div>
+        </div>
     </div>
 </body>
+
 </html>

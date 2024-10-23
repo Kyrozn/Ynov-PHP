@@ -1,0 +1,284 @@
+/* Structure générale */
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f3f6f8;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+/* Conteneur principal */
+.container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.topnav {
+  display: flex;
+  justify-content: center;
+  background-color: #333;
+  padding: 10px;
+  max-height: 70px;
+  position: relative;
+  align-items: center;
+}
+
+/* Titre principal */
+h1 {
+  font-size: 2.4rem;
+  font-weight: bold;
+  color: #0073b1;
+  margin-bottom: 10px;
+}
+
+/* Sous-titre */
+h2 {
+  font-size: 1.5rem;
+  font-weight: normal;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+/* Section de la photo de profil */
+.profile-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.profile-header img {
+  border-radius: 50%;
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  margin-right: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.profile-info {
+  flex-grow: 1;
+}
+
+.profile-info h1 {
+  margin: 0;
+  color: #333;
+}
+
+.profile-info p {
+  margin: 5px 0;
+  color: #666;
+}
+
+/* Section des détails */
+.section {
+  margin-bottom: 40px;
+}
+
+.section h3 {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #0073b1;
+  border-bottom: 2px solid #e9eef3;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+/* Liste des informations */
+.info-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.info-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid #e9eef3;
+  display: flex;
+  justify-content: space-between;
+}
+
+.info-list li span {
+  color: #666;
+}
+
+.info-list li:last-child {
+  border-bottom: none;
+}
+
+/* Boutons */
+.button {
+  background-color: #0073b1;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.button:hover {
+  background-color: #005582;
+}
+
+.button-secondary {
+  background-color: #e9eef3;
+  color: #0073b1;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-weight: bold;
+  border: 1px solid #0073b1;
+  transition: background-color 0.3s;
+}
+
+.button-secondary:hover {
+  background-color: #d8dde1;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .profile-header {
+      flex-direction: column;
+      text-align: center;
+  }
+
+  .profile-header img {
+      margin-bottom: 20px;
+  }
+}
+/* Modal Styles */
+.modal {
+  display: none; /* Cachée par défaut */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.close-btn {
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #333;
+}
+
+.close-btn:hover {
+  color: #0073b1;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: #0073b1;
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content form label {
+  margin: 10px 0 5px;
+  color: #333;
+}
+
+.modal-content form input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.modal-content form .button {
+  background-color: #0073b1;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  text-transform: uppercase;
+  align-self: flex-start;
+}
+
+.modal-content form .button:hover {
+  background-color: #005582;
+}
+
+.BackgroundImage {
+  width: 100%;
+  height: 15vh;
+}
+/* Logout Button: Fixed at the top right */
+.logout-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.logout {
+  text-decoration: none;
+  font-size: 16px;
+  color: #0073b1;
+  font-weight: bold;
+  padding: 10px 15px;
+  border: 1px solid #0073b1;
+  border-radius: 4px;
+  background-color: #e9eef3;
+  transition: background-color 0.3s;
+}
+
+.logout:hover {
+  background-color: #d8dde1;
+}
+
+/* Header Section: Flexbox for the settings button */
+.header-controls {
+  display: flex;
+  justify-content: flex-end; /* Aligner le bouton paramètres à droite */
+  padding: 10px;
+}
+
+#editBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+}
+
+#editBtn img {
+  width: 24px;
+  height: 24px;
+}
+
+.containerProject {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}

@@ -23,7 +23,10 @@ $Users;
 $stmt = $pdo->prepare('SELECT * FROM Users');
 $stmt->execute();
 $Users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+$Pivot;
+$stmt = $pdo->prepare('SELECT * FROM ProjectsUsers');
+$stmt->execute();
+$Pivot = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -31,7 +34,7 @@ $Users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/ressources/index.css">
+    <link rel="stylesheet" href="/static/index.css">
     <style>
         body {
             margin: 0;
@@ -132,6 +135,11 @@ $Users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             width: 200px;
             opacity: 1;
         }
+        .PPUser {
+            max-height: 60px;
+            max-width: 60px;
+            border-radius: 100%;
+        }
     </style>
 </head>
 
@@ -140,12 +148,20 @@ $Users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div style="display: flex; align-items: center;">
             <input id="inputBar" placeholder="Search User, Specific Project if he exists" type="text">
             <button class="Search" aria-label="Search">
-                <img src="./ressources/loupe.png" alt="Search icon" class="animated-image">
+                <img src="./static/loupe.png" alt="Search icon" class="animated-image">
             </button>
+        </div>
+        <div style="display: flex;justify-content: center;flex-direction: column;align-items: center; color:white;">
+            <? if (!isset($_COOKIE['UserTokenSession'])) : ?>
+                <h2>Welcome To This WebSite</h2>
+            <? else : ?>
+                <h2>Welcome <? echo htmlspecialchars($personalInfo['First_name'] . " " . $personalInfo['Last_name']); ?></h2>
+            <? endif; ?>
+
         </div>
         <button class="hamburger" type="button" aria-expanded="false" aria-controls="menu">
             <span class="hamburger-box">
-                <img src="./ressources/menu.png" alt="Menu icon" class="animated-image">
+                <img src="./static/menu.png" alt="Menu icon" class="animated-image">
             </span>
         </button>
 
@@ -159,7 +175,6 @@ $Users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <a href="register.php" style="text-decoration: none; color: white;">
                         <li>Register</li>
                     </a>
-                    <li>Lien n°3</li>
                 <? else : ?>
                     <a href="profil.php" style="text-decoration: none; color: white;">
                         <li>Your Profil</li>
@@ -175,10 +190,7 @@ $Users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </nav>
     </header>
 
-    <div style="display: flex;justify-content: center;flex-direction: column;align-items: center;">
-        <h2>Welcome To This WebSite</h2>
-        <p>You can found Here The different Project Created by our User, See their CVs, And Contact Them</p>
-    </div>
+    <p style="text-align: center;">You can found Here The different Project Created by our User, See their CVs, And Contact Them</p>
 
     <div class="main-gallery">
         <div class="main-column">
@@ -186,16 +198,18 @@ $Users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <? if ($counter >= 10) { ?>
                     break;
                 <? } ?>
-                <div class="main-gallery-project__block" id="<? echo $user['Id']; ?>">
-                    <!-- Display project details here -->
-                    <? if (!is_null($user['PP_User'])) : ?>
-                        <img src=<?php echo $user['PP_User'] ?> alt="PP User" class="PPUser">
-                    <? else : ?>
-                        <img src="/ressources/user_Img.png" alt="PP User" class="PPUser">
-                    <? endif; ?>
-                    <h3><?php echo $user['First_name'], " ", $user['Last_name']; ?></h3>
-                    <p style="text-align: center;"><?php echo $user['UserText']; ?></p>
-                </div>
+                <a href="profil.php?id=<? echo $user['Id']; ?>" style="text-decoration: none; color: black">
+                    <div class="main-gallery-project__block" id="<? echo $user['Id']; ?>">
+                        <!-- Display project details here -->
+                        <? if (!is_null($user['PP_User'])) : ?>
+                            <img src="./ImageUpload/UserPP/<?php echo $user['PP_User'] ?>" alt="PP User" class="PPUser">
+                        <? else : ?>
+                            <img src="/static/user_Img.png" alt="PP User" class="PPUser">
+                        <? endif; ?>
+                        <h3><?php echo $user['First_name'], " ", $user['Last_name']; ?></h3>
+                        <p style="text-align: center;"><?php echo $user['UserText']; ?></p>
+                    </div>
+                </a>
                 <? $counter++ ?>
             <? } ?>
         </div>
@@ -204,21 +218,31 @@ $Users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <? if ($counter >= 10) { ?>
                     break;
                 <? } ?>
-                <div class="main-gallery-project__block" id="<? echo $project['Project_Id']; ?>">
-                    <!-- Display project details here -->
-                    <h6></h6>
-                    <h3><?php echo $project['Title']; ?></h3>
-                    <h4>by <?php $stmt = $pdo->prepare('SELECT First_name, Last_name FROM Users WHERE Id = ?');
-                            $stmt->execute([$project['User_ID']]);
-                            $user = $stmt->fetch();
-                            echo htmlspecialchars($user['First_name'] . " " . $user['Last_name']) ?></h4>
-                    <? if (!is_null($project['LinkImage'])) : ?>
-                        <img src=<?php echo $project['LinkImage'] ?> alt="Search icon" class="animated-image">
-                    <? else : ?>
-                        <img src="/ressources/logoYnov.jpg" alt="Search icon" class="animated-image">
-                    <? endif; ?>
-                    <p style="text-align: center;"><?php echo $project['Description']; ?></p>
-                </div>
+                <a href="project.php?id=<? echo $project['Project_Id']; ?>" style="text-decoration: none; color: black">
+                    <div class="main-gallery-project__block" id="<? echo $project['Project_Id']; ?>">
+                        <!-- Display project details here -->
+                        <div>
+                            <div style="display: flex; flex-direction: row; align-items: center;">
+                                <? if (!is_null($project['LinkImage'])) : ?>
+                                    <img src="../ImageUpload/OtherImg/<?php echo $project['LinkImage'] ?>" alt="Search icon" class="animated-image">
+                                <? else : ?>
+                                    <img src="/static/logoYnov.jpg" alt="Search icon" class="animated-image">
+                                <? endif; ?>
+                                <h3 style="margin-left: 5px;"><?php echo $project['Title']; ?></h3>
+                            </div>
+
+                            <h6 style="margin-top: 5px;">Subjects: <?php echo $project['Subjects']; ?> by <?php $stmt = $pdo->prepare('SELECT * FROM ProjectsUsers WHERE Projects_Id = ?');
+                                                                                                            $stmt->execute([$project['Project_Id']]);
+                                                                                                            $pivot = $stmt->fetch();
+                                                                                                            $stmt = $pdo->prepare('SELECT First_name, Last_name FROM Users WHERE Id = ?');
+                                                                                                            $stmt->execute([$pivot['Users_Id']]);
+                                                                                                            $user = $stmt->fetch();
+                                                                                                            echo htmlspecialchars($user['First_name'] . " " . $user['Last_name']) ?></h6>
+                            </h6>
+                        </div>
+                        <p style="text-align: center;"> Description : <?php echo $project['Description']; ?></p>
+                    </div>
+                </a>
             <? $counter++;
             } ?>
         </div>
@@ -227,7 +251,7 @@ $Users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <footer>
         <p>© 2024 YNOV</p>
         <a href="#" class="logo">
-            <img alt="ynov campus" src="/ressources/YnovCampusLogo.png">
+            <img alt="ynov campus" src="/static/YnovCampusLogo.png">
         </a>
     </footer>
 

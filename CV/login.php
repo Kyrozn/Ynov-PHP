@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
     $admin = $stmt->fetch();
-    
+
     // If the admin user is found, verify the password
     if ($admin && password_verify($password, $admin['Password'])) {
         // Mot de passe correct, connexion réussie
@@ -31,33 +31,50 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         // Si l'utilisateur n'existe pas ou que le mot de passe est incorrect
         $error = "Invalid username or password!";
-    }   
+    }
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="/ressources/styles.css">
+    <link rel="stylesheet" href="/static/login.css">
 </head>
+
 <body>
     <div class="container">
-        <h2>Admin Login</h2>
-        <?php if (isset($error)): ?>
-            <p style="color:red;"><?php echo $error; ?></p>
-        <?php endif; ?>
-        <form method="POST" action="">
-            <label for="username">Email/UserName:</label>
-            <input type="text" id="username" name="username" required>
-            
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-            
-            <input type="submit" value="Login">
-        </form>
+        <div class="screen">
+            <div class="screen__content">
+                <?php if (isset($error)): ?>
+                    <p style="color:red;"><?php echo $error; ?></p>
+                <?php endif; ?>
+                <form method="POST" action="" class="login">
+                    <div class="login__field">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="username" name="username" class="login__input" placeholder="User name / Email" required>
+                    </div>
+                    <div class="login__field">
+                        <i class="login__icon fas fa-lock"></i>
+                        <input type="password" id="password" name="password" class="login__input" placeholder="Password" required>
+                    </div>
+                    <button class="button login__submit">
+                        <span class="button__text">Log In Now</span>
+                        <i class="button__icon fas fa-chevron-right"></i>
+                    </button>
+                </form>
+            </div>
+            <div class="screen__background">
+                <span class="screen__background__shape screen__background__shape4"></span>
+                <span class="screen__background__shape screen__background__shape3"></span>
+                <span class="screen__background__shape screen__background__shape2"></span>
+                <span class="screen__background__shape screen__background__shape1"></span>
+            </div>
+        </div>
     </div>
 </body>
+
 </html>

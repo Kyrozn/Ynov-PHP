@@ -1,4 +1,4 @@
-<?php function guidv4() {
+<?php function guidv4(): string {
     $data = null;
     // Generate 16 bytes (128 bits) of random data or use the data passed into the function.
     $data = $data ?? random_bytes(16);
@@ -12,4 +12,3 @@
     // Output the 36 character UUID.
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
-?>

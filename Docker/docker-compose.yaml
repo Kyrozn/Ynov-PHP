@@ -10,13 +10,18 @@ services:
     build: services/php
     volumes:
       - ../CV:/app
+    expose:
+      - 9000
   db:
     image: mariadb:latest
     environment:
-      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_ROOT_PASSWORD: "Admin"
       MYSQL_DATABASE: "ynovphp_db"
+      MYSQL_USER: "user"
+      MYSQL_PASSWORD: "ProjectPHP.Docker"
     volumes:
       - mysqldata:/var/lib/mysql
+      - ./db_data:/docker-entrypoint-initdb.d
     ports:
       - 4000:4000
   adminer:

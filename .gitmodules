@@ -1,0 +1,3 @@
+[submodule "CV/vendor/dompdf/dompdf"]
+	path = CV/vendor/dompdf/dompdf
+	url = https://github.com/Kyrozn/Ynov-PHP.git

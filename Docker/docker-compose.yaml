@@ -9,7 +9,7 @@ services:
   app:
     build: services/php
     volumes:
-      - ../CV:/app
+      - ../Web:/app
     expose:
       - 9000
   db:

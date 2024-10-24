@@ -68,3 +68,33 @@ function addEducation() {
 function remove(button) {
     button.parentElement.remove();
 }
+
+document.getElementById('pdfForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Empêche l'envoi du formulaire
+
+    // Récupère le contenu HTML du textarea
+    var content = document.getElementById('formCV').innerHTML;
+
+    // Envoie le contenu au serveur
+    fetch('function.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'html=' + encodeURIComponent(content),
+    })
+    .then(response => response.blob()) // Récupère le PDF en tant que blob
+    .then(blob => {
+        // Crée un lien pour télécharger le PDF
+        var url = window.URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'CV.pdf'; // Nom du fichier
+        document.body.appendChild(a);
+        a.click(); // Simule un clic pour télécharger le PDF
+        window.URL.revokeObjectURL(url); // Libère l'URL
+        a.remove(); // Supprime l'élément de la page
+    })
+    .catch(error => console.error('Erreur:', error));
+});

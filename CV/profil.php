@@ -2,11 +2,11 @@
 session_start();
 require_once 'db.php'; // Include the database connection
 require_once 'function.php';
-
 $personalInfo;
 $Cvinfo;
 
 $requestUri = $_SERVER['REQUEST_URI'];
+
 
 // Remove any query string from the URL
 $requestUri = parse_url($requestUri, PHP_URL_PATH);
@@ -47,7 +47,7 @@ if (!isset($_GET['id'])) {
         $Skills = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 } else {
-    
+
 
     $voucherId = $_GET['id'];
     if ($voucherId === $_COOKIE['UserTokenSession']) {
@@ -123,7 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['PPupload'])) {
         $stmt->execute([$safeFileName, $userId]);
         header("Location: profil.php");
     }
-}   
+}
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
     $Title = $_POST['TitleUser'];
     $Description = $_POST['DescriptionUser'];
@@ -220,7 +220,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
     <div class="logout-container">
         <a href="index.php" class="logout">Return</a>
     </div>
-    <div class="container">
+    <div class="Header-container">
         <!-- Header Section -->
         <header>
             <? if (!is_null($personalInfo['BackgroundUser'])) : ?>
@@ -239,7 +239,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
                     <form id="uploadForm" style="display: flex;" action="" method="POST" enctype="multipart/form-data">
                         <label for="PPupload">
                             <?php if (!is_null($personalInfo['PP_User'])) : ?>
-                                <img src="./ImageUpload/UserPP/<?php echo htmlspecialchars($personalInfo['PP_User']); ?>" alt="PP User" class="PPUser" id="PPUser" >
+                                <img src="./ImageUpload/UserPP/<?php echo htmlspecialchars($personalInfo['PP_User']); ?>" alt="PP User" class="PPUser" id="PPUser">
                             <?php else : ?>
                                 <img src="/ImageUpload/UserPP/user_Img.png" alt="PP User" class="PPUser" id="PPUser">
                             <?php endif; ?>
@@ -304,12 +304,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
         </div>
     </div>
 
-    <div class="container CV">
+    <div class="containerCV">
         <? if (isset($_COOKIE['UserTokenSession']) && isset($personalInfo) && $personalInfo['Id'] === $_COOKIE['UserTokenSession']) : ?>
             <h1 style="text-align:center;">Création et édition du CV</h1>
             <div class="container">
 
-                <form action="" method="post">
+                <form action="" method="post" id="formCV">
                     <!-- Informations personnelles -->
                     <h2 style="text-align: center;">Titre - description</h2>
                     <label for="TitleUser">Titre</label>
@@ -365,6 +365,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
                     <!-- Soumettre -->
                     <button type="submit" class="register">Enregistrer le CV</button>
                 </form>
+                <form id="pdfForm">
+                    <button type="submit">Generate CV from this template</button>
+                </form>
             </div>
         <? else : ?>
             <? if ($Cvinfo === " ") { ?>
@@ -372,7 +375,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
             <? } else { ?>
 
                 <h1 style="text-align:center;">CV</h1>
-                <div class="container" style="width: auto">
+                <div class="container" style="width: auto" id="formCV">
                     <h2>Informations personnelles</h2>
                     <h3>Nom complet</h3>
                     <p><? echo $personalInfo['First_name'] ?> <? echo $personalInfo['Last_name'] ?></p>
@@ -406,12 +409,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
                         <p><? echo $EduExt['Start_Date'] ?> - <? echo $EduExt['End_Date'] ?></p>
                     <? } ?>
                 </div>
+                <form id="pdfForm">
+                    <button type="submit">Generate CV from this template</button>
+                </form>
             <? } ?>
         <? endif; ?>
     </div>
-    <script src="./static/profil.js">
-        
-    </script>
+    <script src="./static/profil.js"></script>
 </body>
 
 </html>

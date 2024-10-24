@@ -4,7 +4,6 @@ require 'db.php';
 $counter = 0;
 if (isset($_COOKIE['UserTokenSession'])) {
     $userId = $_COOKIE['UserTokenSession'];
-    // Assure-toi que l'ID est un entier pour évi!ter des injections SQL (par mesure de sécurité)
     if (isset($userId)) {
         $stmt = $pdo->prepare('SELECT * FROM Users WHERE Id = ?');
         $stmt->execute([$userId]);

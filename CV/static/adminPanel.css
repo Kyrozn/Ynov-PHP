@@ -1,0 +1,132 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: rgb(255, 255, 255);
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+header {
+    background-color: #4a5568;
+    color: #ffffff;
+    padding: 10px 0;
+    text-align: center;
+}
+
+/* Navigation */
+nav {
+    background-color: #2d3748;
+    color: #ffffff;
+    padding: 10px;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 20px;
+}
+
+nav ul li a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 20%;
+    float: left;
+    background-color: #2d3748;
+    color: #ffffff;
+    height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.sidebar h2 {
+    margin-top: 0;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    margin-bottom: 10px;
+}
+
+.sidebar ul li a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+/* Main Content */
+.main-content {
+    width: 75%;
+    float: right;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.main-content h2 {
+    color: #333333;
+}
+
+/* Account Gestion */
+.account-section {
+    background-color: #ffffff;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.account-section h3 {
+    margin-top: 0;
+}
+
+.account-section table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.account-section table, th, td {
+    border: 1px solid #dddddd;
+}
+
+.account-section th, td {
+    padding: 8px;
+    text-align: left;
+}
+
+/* Project Gestion */
+.project-section {
+    background-color: #ffffff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.project-section h3 {
+    margin-top: 0;
+}
+
+.project-section ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.project-section ul li {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #e2e8f0;
+}

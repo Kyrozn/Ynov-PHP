@@ -15,7 +15,7 @@ $user = $stmt->fetch();
 
 // Vérifier si l'utilisateur est un administrateur
 if ($user['UserRole'] !== 'Admin') {
-    echo "Accès refusé. Vous n'avez pas les droits d'administrateur.";
+    header("Location: index.php");
     exit;
 }
 
@@ -34,7 +34,7 @@ if (isset($_POST['ban_user'])) {
     $userId = $_POST['user_id'];
     $stmt = $pdo->prepare('DELETE FROM Users WHERE Id = ?');
     $stmt->execute([$userId]);
-    header("Location: admin_dashboard.php");
+    header("Location: adminPanel.php");
     exit;
 }
 
@@ -43,16 +43,16 @@ if (isset($_POST['promote_user'])) {
     $userId = $_POST['user_id'];
     $stmt = $pdo->prepare('UPDATE Users SET UserRole = "Admin" WHERE Id = ?');
     $stmt->execute([$userId]);
-    header("Location: admin_dashboard.php");
+    header("Location: adminPanel.php");
     exit;
 }
 
 // Approuver un projet
 if (isset($_POST['approve_project'])) {
     $projectId = $_POST['project_id'];
-    $stmt = $pdo->prepare('UPDATE Projects SET Is_Approved = 1 WHERE Project_ID = ?');
+    $stmt = $pdo->prepare('UPDATE Projects SET Validate = 1 WHERE Project_ID = ?');
     $stmt->execute([$projectId]);
-    header("Location: admin_dashboard.php");
+    header("Location: adminPanel.php");
     exit;
 }
 ?>
@@ -63,7 +63,7 @@ if (isset($_POST['approve_project'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tableau de bord Admin</title>
-    <link rel="stylesheet" href="../static/admin_dashboard.css">
+    <link rel="stylesheet" href="./static/adminPanel.css">
 </head>
 <body>
 
@@ -80,7 +80,7 @@ if (isset($_POST['approve_project'])) {
         </tr>
         <?php foreach ($users as $user): ?>
             <tr>
-                <td><?php echo htmlspecialchars($user['Username']); ?></td>
+                <td><?php echo htmlspecialchars($user['First_name'].' '. $user['Last_name']); ?></td>
                 <td><?php echo htmlspecialchars($user['Email']); ?></td>
                 <td><?php echo htmlspecialchars($user['UserRole']); ?></td>
                 <td>

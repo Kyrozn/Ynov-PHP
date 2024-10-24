@@ -121,7 +121,7 @@ if (isset($_GET['id'])) {
                     </div>
                 </div>
                 <?
-                if ($project['Validate'] === 0) {
+                    if ($project['Validate'] === 0) {
                     echo htmlspecialchars("Waiting for admin validation");
                 }
                 ?>

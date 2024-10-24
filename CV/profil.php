@@ -50,7 +50,7 @@ if (!isset($_GET['id'])) {
 
 
     $voucherId = $_GET['id'];
-    if ($voucherId === $_COOKIE['UserTokenSession']) {
+    if (isset($_COOKIE['UserTokenSession']) && $voucherId === $_COOKIE['UserTokenSession']) {
         header("Location: profil.php");
     }
     $stmt = $pdo->prepare('SELECT * FROM Users WHERE Id = ?');

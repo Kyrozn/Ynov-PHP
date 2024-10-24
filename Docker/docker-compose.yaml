@@ -5,7 +5,7 @@ services:
       - "5050:5050"
     volumes:
       - ./services/nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
-      - ../CV:/app
+      - ../Web:/app
   app:
     build: services/php
     volumes:

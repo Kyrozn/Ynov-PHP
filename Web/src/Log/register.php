@@ -1,7 +1,7 @@
 <?php
 session_start();
-require 'db.php'; // Include the database connection
-require_once('function.php');
+require __DIR__ . '/../Func/db.php'; // Include the database connection
+require_once __DIR__ . '/../Func/function.php';
 
 // Initialize error variable
 $error = '';
@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute([$uuidGenerated, $Fname, $Lname, $email, password_hash($password, PASSWORD_DEFAULT), "SimpleUser"]);
 
         setcookie("UserTokenSession", $uuidGenerated, 0, '/', '', false, true);
-        header("Location: index.php");
+        header("Location: /");
         exit(); // Ensure no further code is executed after redirect
     } else {
         $error = "An account is already registered with this email address.";
@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Registration</title>
-    <link rel="stylesheet" href="/static/login.css">
+    <link rel="stylesheet" href="../../static/login.css">
 </head>
 
 <body>

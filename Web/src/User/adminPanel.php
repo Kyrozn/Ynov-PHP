@@ -1,10 +1,10 @@
 <?php
 session_start();
-require 'db.php'; // Connexion à la base de données
+require __DIR__ . '/../Func/db.php'; // Connexion à la base de données
 
 // Vérifier si l'utilisateur est connecté
 if (!isset($_COOKIE['UserTokenSession'])) {
-    header("Location: index.php");
+    header("Location: /");
     exit;
 }
 
@@ -15,7 +15,7 @@ $user = $stmt->fetch();
 
 // Vérifier si l'utilisateur est un administrateur
 if ($user['UserRole'] !== 'Admin') {
-    header("Location: index.php");
+    header("Location: /");
     exit;
 }
 
@@ -34,7 +34,7 @@ if (isset($_POST['ban_user'])) {
     $userId = $_POST['user_id'];
     $stmt = $pdo->prepare('DELETE FROM Users WHERE Id = ?');
     $stmt->execute([$userId]);
-    header("Location: adminPanel.php");
+    header("Location: /admin");
     exit;
 }
 
@@ -43,7 +43,7 @@ if (isset($_POST['promote_user'])) {
     $userId = $_POST['user_id'];
     $stmt = $pdo->prepare('UPDATE Users SET UserRole = "Admin" WHERE Id = ?');
     $stmt->execute([$userId]);
-    header("Location: adminPanel.php");
+    header("Location: /admin");
     exit;
 }
 
@@ -52,7 +52,7 @@ if (isset($_POST['approve_project'])) {
     $projectId = $_POST['project_id'];
     $stmt = $pdo->prepare('UPDATE Projects SET Validate = 1 WHERE Project_ID = ?');
     $stmt->execute([$projectId]);
-    header("Location: adminPanel.php");
+    header("Location: /admin");
     exit;
 }
 ?>
@@ -63,7 +63,7 @@ if (isset($_POST['approve_project'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tableau de bord Admin</title>
-    <link rel="stylesheet" href="./static/adminPanel.css">
+    <link rel="stylesheet" href="../../static/adminPanel.css">
 </head>
 <body>
 

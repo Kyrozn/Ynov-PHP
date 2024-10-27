@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'db.php';
+require __DIR__ . '/Func/db.php';
 $counter = 0;
 if (isset($_COOKIE['UserTokenSession'])) {
     $userId = $_COOKIE['UserTokenSession'];
@@ -33,7 +33,7 @@ $Pivot = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="./static/index.css">
+    <link rel="stylesheet" href="../static/index.css">
 </head>
 
 <body>
@@ -66,25 +66,25 @@ $Pivot = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <nav id="menu">
             <ul>
                 <? if (!isset($_COOKIE['UserTokenSession'])) : ?>
-                    <a href="login.php" style="text-decoration: none; color: white;">
+                    <a href="/login" style="text-decoration: none; color: white;">
                         <li>Login</li>
                     </a>
-                    <a href="register.php" style="text-decoration: none; color: white;">
+                    <a href="/register" style="text-decoration: none; color: white;">
                         <li>Register</li>
                     </a>
                 <? else : ?>
-                    <a href="profil.php" style="text-decoration: none; color: white;">
+                    <a href="/profil" style="text-decoration: none; color: white;">
                         <li>Your Profil</li>
                     </a>
-                    <a href="project.php" style="text-decoration: none; color: white;">
+                    <a href="/project" style="text-decoration: none; color: white;">
                         <li>Your Projects</li>
                     </a>
                     <? if ($personalInfo['UserRole'] === "Admin") : ?>
-                        <a href="adminPanel.php" style="text-decoration: none; color: white;">
+                        <a href="/admin" style="text-decoration: none; color: white;">
                             <li>Admin Panel</li>
                         </a>
                     <? endif; ?>
-                    <a href="logout.php" style="text-decoration: none; color: white;">
+                    <a href="/logout" style="text-decoration: none; color: white;">
                         <li>Logout</li>
                     </a>
                 <? endif; ?>
@@ -100,7 +100,7 @@ $Pivot = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <? if ($counter >= 10) {
                     break;
                 } ?>
-                <a href="profil.php?id=<? echo $user['Id']; ?>" style="text-decoration: none; color: black">
+                <a href="/profil?id=<?= $user['Id']; ?>" style="text-decoration: none; color: black">
                     <div class="main-gallery-project__block" id="<? echo $user['Id']; ?>">
                         <!-- Display project details here -->
                         <? if (!is_null($user['PP_User'])) : ?>
@@ -121,7 +121,7 @@ $Pivot = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     break;
                 } ?>
                 <? if ($project['Validate'] === 1) { ?>
-                    <a href="project.php?id=<? echo $project['Project_Id']; ?>" style="text-decoration: none; color: black">
+                    <a href="/project?id=<? echo $project['Project_Id']; ?>" style="text-decoration: none; color: black">
                         <div class="main-gallery-project__block" id="<? echo $project['Project_Id']; ?>">
                             <!-- Display project details here -->
                             <div>
@@ -192,7 +192,7 @@ $Pivot = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         const userDiv = document.createElement('div');
                         userDiv.classList.add('search-result');
                         userDiv.innerHTML = `
-                            <a href="profil.php?id=<?php echo $user['Id']; ?>" style="text-decoration: none; color: white; display: flex; align-items: center;">
+                            <a href="/profil?id=<?php echo $user['Id']; ?>" style="text-decoration: none; color: white; display: flex; align-items: center;">
                                 <img src="./ImageUpload/UserPP/<?php echo $user['PP_User'] ?? 'user_Img.png'; ?>" class="PPUser" style="width:30px; height:30px" alt="PP User">
                                 <h4>${'<?php echo htmlspecialchars($user['First_name'] . " " . $user['Last_name']); ?>'}</h4>
                             </a>
@@ -205,7 +205,7 @@ $Pivot = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         const userDiv = document.createElement('div');
                         userDiv.classList.add('search-result');
                         userDiv.innerHTML = `
-                            <a href="project.php?id=<?php echo $project['Project_Id']; ?>" style="text-decoration: none; color: white; display: flex; align-items: center;">
+                            <a href="/project?id=<?php echo $project['Project_Id']; ?>" style="text-decoration: none; color: white; display: flex; align-items: center;">
                                 <img src="./ImageUpload/OtherImg/<?php echo $project['LinkImage'] ?? 'user_Img.png'; ?>" class="PPUser" style="width:30px; height:30px" alt="PP User">
                                 <h4>${'<?php echo htmlspecialchars($project['Title']); ?>'}</h4>
                             </a>

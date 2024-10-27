@@ -1,12 +1,11 @@
 <?php
 session_start();
-require_once 'db.php'; // Include the database connection
-require_once 'function.php';
+require_once __DIR__ . '/../Func/db.php'; // Include the database connection
+require_once __DIR__ . '/../Func/function.php';
 $personalInfo;
 $Cvinfo;
 
 $requestUri = $_SERVER['REQUEST_URI'];
-
 
 // Remove any query string from the URL
 $requestUri = parse_url($requestUri, PHP_URL_PATH);
@@ -27,7 +26,7 @@ if (!isset($_GET['id'])) {
         $stmt->execute([$userId]);
         $Cvinfo = $stmt->fetch();
     } else {
-        header("Location: index.php");
+        header("Location: /");
     }
 
     if (isset($Cvinfo['CV_ID'])) {
@@ -51,7 +50,7 @@ if (!isset($_GET['id'])) {
 
     $voucherId = $_GET['id'];
     if (isset($_COOKIE['UserTokenSession']) && $voucherId === $_COOKIE['UserTokenSession']) {
-        header("Location: profil.php");
+        header("Location: /profil");
     }
     $stmt = $pdo->prepare('SELECT * FROM Users WHERE Id = ?');
     $stmt->execute([$voucherId]);
@@ -88,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['F_name'])) {
     // Update personal information in the database
     $stmt = $pdo->prepare('UPDATE Users SET First_name = ?, Last_name = ?, Email = ?, UserText = ?, PhoneNB = ? WHERE Id = ?');
     $stmt->execute([$Fname, $Lname, $email, $UserTxt, $phone, $personalInfo['Id']]);
-    header("Location: profil.php");
+    header("Location: /profil");
     exit;
 }
 
@@ -121,7 +120,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['PPupload'])) {
     if (move_uploaded_file($file['tmp_name'], $fileDestination)) {
         $stmt = $pdo->prepare('UPDATE Users SET PP_User = ? WHERE Id = ?');
         $stmt->execute([$safeFileName, $userId]);
-        header("Location: profil.php");
+        header("Location: /profil");
     }
 }
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
@@ -200,7 +199,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
             }
         }
     }
-    header("Location: " . $_SERVER['PHP_SELF']);
+    header("Location: /profil");
     exit();
 }
 
@@ -213,12 +212,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profil</title>
-    <link rel="stylesheet" href="/static/profil.css">
+    <link rel="stylesheet" href="../../static/profil.css">
 </head>
 
 <body>
     <div class="logout-container">
-        <a href="index.php" class="logout">Return</a>
+        <a href="/" class="logout">Return</a>
     </div>
     <div class="Header-container">
         <!-- Header Section -->
@@ -415,7 +414,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
             <? } ?>
         <? endif; ?>
     </div>
-    <script src="./static/profil.js"></script>
+    <script src="../../static/profil.js"></script>
 </body>
 
 </html>

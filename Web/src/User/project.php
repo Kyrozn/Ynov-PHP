@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'db.php'; // Include the database connection
+require_once __DIR__ . '/../Func/db.php'; // Include the database connection
 
 // index.php
 $requestUri = $_SERVER['REQUEST_URI'];
@@ -44,11 +44,8 @@ if (isset($_GET['id'])) {
     }
     $stmt = $pdo->prepare('SELECT * FROM Users');
     $stmt->execute();
-    $AllUsers = $stmt->fetch();
+    $AllUsers = $stmt->fetchAll();
 }
-
-
-
 ?>
 
 <!DOCTYPE html>
@@ -58,7 +55,7 @@ if (isset($_GET['id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project</title>
-    <link rel="stylesheet" href="./static/styles.css">
+    <link rel="stylesheet" src="../../static/project.css">
 </head>
 
 <? if (isset($_GET['id'])) : ?>
@@ -66,7 +63,7 @@ if (isset($_GET['id'])) {
     <body>
         <header style="justify-content: space-around;" class="topnav">
             <h1 style="text-align:center; color:white;">Project Information : <? echo $projectInfo['Title'] ?? "" ?></h1>
-            <a style="text-decoration:none; color:white" href="http://localhost:5050">HOME</a>
+            <a style="text-decoration:none; color:white" href="/">HOME</a>
         </header>
 
         <div class="containerProject">
@@ -98,7 +95,7 @@ if (isset($_GET['id'])) {
     <body>
         <header style="justify-content: space-around;" class="topnav">
             <h1 style="text-align:center; color:white;"><? echo htmlspecialchars($personalInfo['First_name'] . " " . $personalInfo['Last_name']) ?> Differents Projet</h1>
-            <a style="text-decoration:none; color:white" href="http://localhost:5050">HOME</a>
+            <a style="text-decoration:none; color:white" href="/">HOME</a>
         </header>
 
         <div>
@@ -120,7 +117,7 @@ if (isset($_GET['id'])) {
                     <div id="Collaborator-container">
                         <label for="collaborator">Colaborator</label>
                         <? foreach ($TeamInfo as $team) { ?>
-                           <div>
+                            <div>
                                 <a style="color:black;text-decoration:none;" href="profil.php?id=<? echo $team['Id']; ?>">
                                     <h4 style="border-radius: 25px; border: 2px solid black;padding: 15px;"><? echo $team['First_name'] ?? "" ?> <? echo $team['Last_name'] ?? "" ?></h4>
                                 </a>
@@ -161,8 +158,23 @@ if (isset($_GET['id'])) {
                 ?>
             </div>
         <? endforeach ?>
-        <script src="./static/project.js"></script>
         <script>
+            function addCollab() {
+                const collabDiv = document.createElement("div");
+                collabDiv.innerHTML = `
+                <label for="collaborator">Colaborator</label>
+                                <input type="text" id="collaborator" name="collaborator[]" placeholder="User" value="<? echo $collab['School'] ?? "" ?>">
+                <button type="button" onclick="remove(this)" class="AddButton">-</button>
+                <br><br>
+                 `;
+                document.getElementById("Collaborator-container").appendChild(collabDiv);
+            }
+
+            // Fonction pour supprimer une entrée de formation
+            function remove(button) {
+                button.parentElement.remove();
+            }
+
             function getLiveValue() {
                 const inputValue = document.getElementById('inputBar').value.toLowerCase();
                 const resultBox = document.querySelector('.resultBox');

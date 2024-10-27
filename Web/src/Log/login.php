@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'db.php'; // Include the database connection
+require __DIR__ . '/../Func/db.php'; // Include the database connection
 
 // Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($admin && password_verify($password, $admin['Password'])) {
         // Mot de passe correct, connexion réussie
         setcookie("UserTokenSession", $admin['Id'], 0, '/', '', false, true);
-        header("Location: index.php");
+        header("Location: /");
         exit;
     } else {
         // Si l'utilisateur n'existe pas ou que le mot de passe est incorrect
@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="/static/login.css">
+    <link rel="stylesheet" href="../../static/login.css">
 </head>
 
 <body>

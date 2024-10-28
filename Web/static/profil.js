@@ -68,20 +68,49 @@ function addEducation() {
 function remove(button) {
     button.parentElement.remove();
 }
+function prepareHTMLForPDF() {
+    // Transforme les inputs text en éléments <p>
+    document.querySelectorAll('input[type="text"]').forEach(input => {
+        const text = input.value; // Récupère la valeur de l'input
+        const p = document.createElement('p'); // Crée un élément <p>
+        p.textContent = text; // Assigne le texte
+        input.parentNode.replaceChild(p, input); // Remplace l'input par <p>
+    });
 
+    // Transforme les inputs de date en éléments <p>
+    document.querySelectorAll('input[type="date"]').forEach(input => {
+        const text = input.value; // Récupère la valeur de la date
+        const p = document.createElement('p');
+        p.textContent = text;
+        input.parentNode.replaceChild(p, input);
+    });
+
+    // Transforme les inputs number en éléments <p>
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+        const text = input.value; // Récupère la valeur numérique
+        const p = document.createElement('p');
+        p.textContent = text;
+        input.parentNode.replaceChild(p, input);
+    });
+
+    // Supprime les boutons d'ajout (+) et autres boutons inutiles
+    document.querySelectorAll('.AddButton, .register').forEach(button => {
+        button.remove();
+    });
+}
 document.getElementById('pdfForm').addEventListener('submit', function(event) {
     event.preventDefault(); // Empêche l'envoi du formulaire
-
+    prepareHTMLForPDF();
     // Récupère le contenu HTML du textarea
     var content = document.getElementById('formCV').innerHTML;
-
+    content = content.replaceAll("<input>")
     // Envoie le contenu au serveur
-    fetch('function.php', {
+    fetch('../src/Func/function.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: 'html=' + encodeURIComponent(content),
+        body: 'html=' + encodeURIComponent(content), 
     })
     .then(response => response.blob()) // Récupère le PDF en tant que blob
     .then(blob => {
@@ -90,7 +119,7 @@ document.getElementById('pdfForm').addEventListener('submit', function(event) {
         var a = document.createElement('a');
         a.style.display = 'none';
         a.href = url;
-        a.download = 'CV.pdf'; // Nom du fichier
+        a.download = 'test.pdf'; // Nom du fichier
         document.body.appendChild(a);
         a.click(); // Simule un clic pour télécharger le PDF
         window.URL.revokeObjectURL(url); // Libère l'URL

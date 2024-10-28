@@ -28,7 +28,7 @@ function htmltopdf($html)
 {
     $dompdf = new Dompdf();
     $dompdf->loadHtml($html);
-
+    echo $html;
     // (Optional) Set paper size and orientation (e.g., A4, portrait)
     $dompdf->setPaper('A4', 'portrait');
 
@@ -36,5 +36,5 @@ function htmltopdf($html)
     $dompdf->render();
 
     // Output the generated PDF (downloadable as "document.pdf")
-    $dompdf->stream("CV.pdf", array("Attachment" => 1));
+    $dompdf->stream("test.pdf", array("Attachment" => 0));
 }

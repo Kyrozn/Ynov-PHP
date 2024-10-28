@@ -28,24 +28,24 @@ if (isset($_GET['id'])) {
     $stmt->execute([$voucherId]);
     $personalInfo = $stmt->fetch();
 
-    $stmt = $pdo->prepare('SELECT * FROM ProjectsUsers WHERE Users_Id = ?');
+    $stmt = $pdo->prepare('SELECT * FROM ProjectsUsers WHERE User_ID = ?');
     $stmt->execute([$voucherId]);
     $pivot = $stmt->fetchAll();
 
     for ($i = 0; $i < count($pivot); $i++) {
         $stmt = $pdo->prepare('SELECT * FROM Users WHERE Id = ?');
-        $stmt->execute([$pivot[$i]['Users_Id']]);
+        $stmt->execute([$pivot[$i]['User_ID']]);
         $TeamInfo = $stmt->fetchAll();
     }
     for ($i = 0; $i < count($pivot); $i++) {
         $stmt = $pdo->prepare('SELECT * FROM Projects WHERE Project_Id = ?');
-        $stmt->execute([$pivot[$i]['Projects_Id']]);
+        $stmt->execute([$pivot[$i]['Project_Id']]);
         $projectInfo = $stmt->fetchAll();
     }
-    $stmt = $pdo->prepare('SELECT * FROM Users');
-    $stmt->execute();
-    $AllUsers = $stmt->fetchAll();
 }
+$stmt = $pdo->prepare('SELECT * FROM Users');
+$stmt->execute();
+$AllUsers = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -55,7 +55,7 @@ if (isset($_GET['id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project</title>
-    <link rel="stylesheet" src="../../static/profil.css">
+    <link rel="stylesheet" href="../../static/project.css">
 </head>
 
 <? if (isset($_GET['id'])) : ?>
@@ -98,7 +98,7 @@ if (isset($_GET['id'])) {
             <a style="text-decoration:none; color:white" href="/">HOME</a>
         </header>
 
-        <div>
+        <div class="containerProject">
             <form>
                 <h5>Subjects : <? echo $projectInfo['Subjects'] ?? "" ?></h5>
                 <div class="container">
@@ -110,9 +110,6 @@ if (isset($_GET['id'])) {
                         <? endif; ?>
                         <h2 style="text-align: center;">Description</h2>
                         <input type="text"><? echo $project['Description'] ?? "" ?></input>
-                    </div>
-                    <input id="inputBar" placeholder="Search User, Specific Project if he exists" type="text" oninput="getLiveValue()">
-                    <div class="resultBox" style="position: absolute;">
                     </div>
                     <div id="Collaborator-container">
                         <label for="collaborator">Colaborator</label>
@@ -163,7 +160,8 @@ if (isset($_GET['id'])) {
                 const collabDiv = document.createElement("div");
                 collabDiv.innerHTML = `
                 <label for="collaborator">Colaborator</label>
-                                <input type="text" id="collaborator" name="collaborator[]" placeholder="User" value="<? echo $collab['School'] ?? "" ?>">
+                                <input type="text" id="addCollab" name="collaborator[]" placeholder="User" value="<? echo $collab['School'] ?? "" ?>" oninput="getLiveValue()">
+                                <div class="resultBox" style="position: absolute;"></div>
                 <button type="button" onclick="remove(this)" class="AddButton">-</button>
                 <br><br>
                  `;
@@ -176,7 +174,7 @@ if (isset($_GET['id'])) {
             }
 
             function getLiveValue() {
-                const inputValue = document.getElementById('inputBar').value.toLowerCase();
+                const inputValue = document.getElementById('addCollab').value.toLowerCase();
                 const resultBox = document.querySelector('.resultBox');
                 resultBox.innerHTML = '';
 
@@ -188,7 +186,7 @@ if (isset($_GET['id'])) {
                             userDiv.innerHTML = `
                             <a href="profil.php?id=<?php echo $user['Id']; ?>" style="text-decoration: none; color: white; display: flex; align-items: center;">
                                 <img src="./ImageUpload/UserPP/<?php echo $user['PP_User'] ?? 'user_Img.png'; ?>" class="PPUser" style="width:30px; height:30px" alt="PP User">
-                                <h4>${'<?php echo htmlspecialchars($user['First_name'] . " " . $user['Last_name']); ?>'}</h4>
+                                <h4 style="color: black">${'<?php echo htmlspecialchars($user['First_name'] . " " . $user['Last_name']); ?>'}</h4>
                             </a>
                         `;
                             resultBox.appendChild(userDiv);

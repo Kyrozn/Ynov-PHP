@@ -267,14 +267,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
             <section class="profile">
                 <h2>Profile</h2>
                 <p><?php echo $personalInfo['UserText']; ?></p>
-                <!--<a href="CV.php">Acceder A Votre CV</a>-->
             </section>
         <?php else: ?>
             <section class="profile">
                 <h2>No Profile Found</h2>
             </section>
         <?php endif; ?>
-        <!-- Modal for updating personal information (visible only for admin) -->
         <div id="myModal" class="modal">
             <div class="modal-content">
                 <span class="close">&times;</span>
@@ -312,7 +310,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
                     <!-- Informations personnelles -->
                     <h2 style="text-align: center;">Titre - description</h2>
                     <label for="TitleUser">Titre</label>
-                    <input type="text" id="Title" name="TitleUser" value="<? echo $Cvinfo['Title'] ?? "" ?>" require>
+                    <input type="text" id="Title" name="TitleUser" value="<? echo $Cvinfo['Title'] ?? "" ?>" required>
 
                     <label for="DescriptionUser">Description</label>
                     <input type="text" id="Description" name="DescriptionUser" value="<? echo $Cvinfo['Description'] ?? "" ?>" required>

@@ -17,8 +17,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: "Admin"
       MYSQL_DATABASE: "ynovphp_db"
-      MYSQL_USER: "user"
-      MYSQL_PASSWORD: "ProjectPHP.Docker"
     volumes:
       - mysqldata:/var/lib/mysql
       - ./db_data:/docker-entrypoint-initdb.d

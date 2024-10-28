@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Installer les dépendances PHP (y compris dompdf via Composer)
-RUN composer install
+RUN curl -sS https://getcomposer.org/installer | php
 
 # Exposer le port 9000 (pour PHP-FPM)
 EXPOSE 9000

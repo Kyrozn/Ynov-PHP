@@ -305,7 +305,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['TitleUser'])) {
         <? if (isset($_COOKIE['UserTokenSession']) && isset($personalInfo) && $personalInfo['Id'] === $_COOKIE['UserTokenSession']) : ?>
             <h1 style="text-align:center;">Création et édition du CV</h1>
             <div class="container">
-
                 <form action="" method="post" id="formCV">
                     <!-- Informations personnelles -->
                     <h2 style="text-align: center;">Titre - description</h2>

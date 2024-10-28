@@ -134,11 +134,11 @@ $Pivot = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <h3 style="margin-left: 5px;"><?php echo $project['Title']; ?></h3>
                                 </div>
 
-                                <h6 style="margin-top: 5px;">Subjects: <?php echo $project['Subjects']; ?> by <?php $stmt = $pdo->prepare('SELECT * FROM ProjectsUsers WHERE Projects_Id = ?');
+                                <h6 style="margin-top: 5px;">Subjects: <?php echo $project['Subjects']; ?> by <?php $stmt = $pdo->prepare('SELECT * FROM ProjectsUsers WHERE Project_Id = ?');
                                                                                                                 $stmt->execute([$project['Project_Id']]);
                                                                                                                 $pivot = $stmt->fetch();
                                                                                                                 $stmt = $pdo->prepare('SELECT First_name, Last_name FROM Users WHERE Id = ?');
-                                                                                                                $stmt->execute([$pivot['Users_Id']]);
+                                                                                                                $stmt->execute([$pivot['User_ID']]);
                                                                                                                 $user = $stmt->fetch();
                                                                                                                 echo htmlspecialchars($user['First_name'] . " " . $user['Last_name']) ?></h6>
                                 </h6>

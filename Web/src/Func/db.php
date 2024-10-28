@@ -3,7 +3,7 @@
 $host = 'db';
 $db = 'ynovphp_db';
 $user = 'root'; // Update this with your MySQL username
-$pass = 'root';     // Update this with your MySQL password
+$pass = 'Admin';     // Update this with your MySQL password
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";

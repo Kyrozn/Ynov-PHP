@@ -12,14 +12,14 @@ $requestUri = parse_url($requestUri, PHP_URL_PATH);
 if (isset($_GET['id'])) {
     $voucherId = $_GET['id'];
     $pivot;
-    $stmt = $pdo->prepare('SELECT * FROM ProjectsUsers WHERE Projects_Id = ?');
+    $stmt = $pdo->prepare('SELECT * FROM ProjectsUsers WHERE Project_Id = ?');
     $stmt->execute([$voucherId]);
     $pivot = $stmt->fetchAll();
     $stmt = $pdo->prepare('SELECT * FROM Users WHERE Id = ?');
-    $stmt->execute([$pivot[0]['Users_Id']]);
+    $stmt->execute([$pivot[0]['User_ID']]);
     $TeamInfo = $stmt->fetchAll();
     $stmt = $pdo->prepare('SELECT * FROM Projects WHERE Project_Id = ?');
-    $stmt->execute([$pivot[0]['Projects_Id']]);
+    $stmt->execute([$pivot[0]['Project_Id']]);
     $projectInfo = $stmt->fetch();
 } else if (isset($_COOKIE['UserTokenSession'])) {
     $voucherId = $_COOKIE['UserTokenSession'];
@@ -55,7 +55,7 @@ if (isset($_GET['id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project</title>
-    <link rel="stylesheet" src="../../static/project.css">
+    <link rel="stylesheet" src="../../static/profil.css">
 </head>
 
 <? if (isset($_GET['id'])) : ?>

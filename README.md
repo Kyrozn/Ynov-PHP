@@ -46,3 +46,4 @@ Si vous souhaitez arréter le docker. 2 possibilité
 docker compose down
 ```
 
+(Pourriez vous prendre en compte le dernier Push,celui a 00:02, le push a mit beaucoup de temps a s'effectuer sans aucune raison)

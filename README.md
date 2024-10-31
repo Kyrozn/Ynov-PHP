@@ -25,15 +25,20 @@
 ```bash
     cd Ynov-PHP/Docker
 ```
-3. Build le docker avec cette commande :
+3. Intaller dompdf :
+```bash
+composer dompdf/dompdf
+```
+4. Build le docker avec cette commande :
 ```bash
     docker compose up
 ```
-4. Accéder a La page initial sur cet url :
+
+5. Accéder a La page initial sur cet url :
 
     localhost:5050
 
-5. Acceder a la bdd :
+6. Acceder a la bdd :
 
     localhost:8080
 

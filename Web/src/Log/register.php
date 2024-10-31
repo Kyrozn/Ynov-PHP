@@ -10,7 +10,7 @@ $error = '';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $Fname = $_POST['Fname'];
     $Lname = $_POST['Lname'];
-    $email = $_POST['email'];
+    $email = strtolower($_POST['email']);
     $password = $_POST['password'];
 
     // Prepare and execute the select statement to check if the email is used

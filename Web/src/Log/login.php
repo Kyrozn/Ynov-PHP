@@ -55,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <form method="POST" action="" class="login">
                     <div class="login__field">
                         <i class="fa-solid fa-user"></i>
-                        <input type="text" id="username" name="username" class="login__input" placeholder="User name / Email" required>
+                        <input type="text" id="username" name="username" class="login__input" placeholder="Full Username / Email" required>
                     </div>
                     <div class="login__field">
                         <i class="login__icon fas fa-lock"></i>

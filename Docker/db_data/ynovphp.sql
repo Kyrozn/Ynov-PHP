@@ -55,7 +55,7 @@ CREATE TABLE Projects (
     Subjects varchar(50),
     Description varchar(100),
     LinkImage varchar(50),
-    Validate int(1),
+    Validate int(1)
 );
 
 CREATE TABLE ProjectsUsers (

@@ -1,5 +1,5 @@
 <?php  
-require 'vendor/autoload.php'; 
+require '/vendor/autoload.php'; 
 
 function guidv4(): string {
     $data = null;

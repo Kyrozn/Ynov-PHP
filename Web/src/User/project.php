@@ -94,6 +94,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = $pdo->prepare('INSERT INTO ProjectsUsers (Project_Id, User_Id) values (?,?)');
     $stmt->execute([$projectid, $id]);
 }
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Title'])) {
+    $Subject = $_POST['Subject'];
+    $Title = $_POST['Title'];
+    $Desc = $_POST['desc'];
+    $NewId = guidv4();
+    // Update personal information in the database
+    $stmt = $pdo->prepare('INSERT INTO Projects (Project_Id, Title, Subjects, Description, Validate) VALUES (?,?,?,?,?)');
+    $stmt->execute([$NewId, $Title, $Subject, $desc, 0]);
+    $stmt = $pdo->prepare('INSERT INTO ProjectsUsers (Project_Id, User_ID) VALUES (?,?)');
+    $stmt->execute([$NewId, $voucherId]);
+    header("Location: /project");
+    // exit;
+}
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['PPupload'])) {
     $file = $_FILES['PPupload'];
 
@@ -181,7 +194,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['PPupload'])) {
         <div class="containerProject">
             <form>
                 <h5>Sujets : </h5>
-                <input type="text" placeholder="Sujets">
+                <input type="text" name="Subject" placeholder="Sujets">
+
                 <div class="container">
                     <div>
                         <? if (isset($project['LinkImage'])) : ?>
@@ -190,10 +204,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['PPupload'])) {
                             <img src="./ImageUpload/OtherImg/logoYnov.jpg">
                         <? endif; ?>
                         <h2 style="text-align: center;">Description</h2>
-                        <input type="text"></input>
+                        <input type="text" name="desc"></input>
                     </div>
+                    <input type="text" name="Title" placeholder="Title">
                     <div id="Collaborator-container">
-
                         <label for="collaborator">Collaborateur</label>
                         <div id="AllCollab">
                             <div style="color:black;text-decoration:none;" id="<? echo $personalInfo['Id']; ?>">
@@ -241,8 +255,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['PPupload'])) {
             function AddcollabChoiced(collab) {
                 console.log(collab)
                 var collabNode = `
-                <div style="color:black;text-decoration:none;" id="`+collab['Id']+`">
-                    <h4 style="border-radius: 25px; border: 2px solid black;padding: 15px;">`+collab['First_name']+` `+collab['Last_name']+`</h4>
+                <div style="color:black;text-decoration:none;" "id="` + collab['Id'] + `">
+                    <h4 style="border-radius: 25px; border: 2px solid black;padding: 15px;">` + collab['First_name'] + ` ` + collab['Last_name'] + `</h4>
                 </div>`
                 document.getElementById("AllCollab").insertAdjacentHTML('beforeend', collabNode);
             }
@@ -314,8 +328,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['PPupload'])) {
                         `;
                             resultBox.appendChild(userDiv);
                             userDiv.addEventListener('click', function() {
-                                
-                                var parameters = <? echo json_encode(fetchUser( $user['Id'], $pdo)) ?>;
+
+                                var parameters = <? echo json_encode(fetchUser($user['Id'], $pdo)) ?>;
                                 AddcollabChoiced(parameters)
                             });
                         }

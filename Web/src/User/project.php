@@ -79,7 +79,19 @@ function fetchUser($Id, $pdo)
 $stmt = $pdo->prepare('SELECT * FROM Users');
 $stmt->execute();
 $AllUsers = $stmt->fetchAll();
-
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Title'])) {
+    $Subject = $_POST['Subject'];
+    $Title = $_POST['Title'];
+    $Desc = $_POST['desc'];
+    $NewId = guidv4();
+    // Update personal information in the database
+    $stmt = $pdo->prepare('INSERT INTO Projects (Project_Id, Title, Subjects, Description, Validate) VALUES (?,?,?,?,?)');
+    $stmt->execute([$NewId, $Title, $Subject, $Desc, 0]);
+    $stmt = $pdo->prepare('INSERT INTO ProjectsUsers (Project_Id, User_ID) VALUES (?,?)');
+    $stmt->execute([$NewId, $voucherId]);
+    header("Location: /project");
+    exit;
+}
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Récupérer les données JSON envoyées par fetch
     $data = json_decode(file_get_contents("php://input"), true);
@@ -94,19 +106,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = $pdo->prepare('INSERT INTO ProjectsUsers (Project_Id, User_Id) values (?,?)');
     $stmt->execute([$projectid, $id]);
 }
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Title'])) {
-    $Subject = $_POST['Subject'];
-    $Title = $_POST['Title'];
-    $Desc = $_POST['desc'];
-    $NewId = guidv4();
-    // Update personal information in the database
-    $stmt = $pdo->prepare('INSERT INTO Projects (Project_Id, Title, Subjects, Description, Validate) VALUES (?,?,?,?,?)');
-    $stmt->execute([$NewId, $Title, $Subject, $desc, 0]);
-    $stmt = $pdo->prepare('INSERT INTO ProjectsUsers (Project_Id, User_ID) VALUES (?,?)');
-    $stmt->execute([$NewId, $voucherId]);
-    header("Location: /project");
-    exit;
-}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['PPupload'])) {
     $file = $_FILES['PPupload'];
 
@@ -192,7 +192,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['PPupload'])) {
         </header>
 
         <div class="containerProject">
-            <form>
+            <form method="post">
                 <h5>Sujets : </h5>
                 <input type="text" name="Subject" placeholder="Sujets">
 

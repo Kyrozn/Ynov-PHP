@@ -68,6 +68,7 @@ if (isset($_POST['approve_project'])) {
 <body>
 
 <div class="container">
+    <a href="/">Home</a>
     <h2>Tableau de bord Admin</h2>
 
     <h3>Utilisateurs inscrits</h3>

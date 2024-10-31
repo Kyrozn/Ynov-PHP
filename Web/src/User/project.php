@@ -105,7 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Title'])) {
     $stmt = $pdo->prepare('INSERT INTO ProjectsUsers (Project_Id, User_ID) VALUES (?,?)');
     $stmt->execute([$NewId, $voucherId]);
     header("Location: /project");
-    // exit;
+    exit;
 }
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['PPupload'])) {
     $file = $_FILES['PPupload'];

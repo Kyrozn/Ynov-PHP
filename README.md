@@ -27,7 +27,7 @@
 ```
 3. Intaller dompdf :
 ```bash
-composer dompdf/dompdf
+composer require dompdf/dompdf
 ```
 4. Build le docker avec cette commande :
 ```bash

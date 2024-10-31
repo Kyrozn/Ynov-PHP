@@ -51,13 +51,11 @@ CREATE TABLE EducationExt (
 
 CREATE TABLE Projects (
     Project_Id varchar(36) PRIMARY KEY,
-    User_ID varchar(36),
     Title varchar(50),
     Subjects varchar(50),
     Description varchar(100),
     LinkImage varchar(50),
     Validate int(1),
-    FOREIGN KEY (User_ID) REFERENCES Users (Id)
 );
 
 CREATE TABLE ProjectsUsers (
@@ -149,7 +147,6 @@ VALUES (
 
 INSERT INTO Projects (
     Project_Id,
-    User_ID,
     Title,
     Subjects,
     Description,
@@ -157,7 +154,6 @@ INSERT INTO Projects (
 )
 VALUES (
     "6c94e2e5-02db-4e03-85ec-0df5700b4bb1",
-    'dc8963d0-267f-4dc5-b582-38ba0ea287af',
     'WebSite PhP for Ynov',
     'WebSite',
     'Here is my class project of making a website using html, php, css, js and docker',

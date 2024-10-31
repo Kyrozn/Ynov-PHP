@@ -6,10 +6,12 @@ services:
     volumes:
       - ./services/nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
       - ../Web:/app
+      - ../vendor:/vendor
   app:
     build: services/php
     volumes:
       - ../Web:/app
+      - ../vendor:/vendor
     expose:
       - 9000
   db:
